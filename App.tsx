@@ -250,6 +250,21 @@ const App: React.FC = () => {
   const [openMetricSelectionLabel, setOpenMetricSelectionLabel] = useState<string | null>(null);
   const [openMigrationInfo, setOpenMigrationInfo] = useState<{ label: string; type: 'upgrade' | 'downgrade' } | null>(null);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get('page');
+    if (page === 'overview' || page === 'manager' || page === 'customer') {
+      setCurrentPage(page);
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', currentPage);
+    const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+    window.history.replaceState(null, '', newUrl);
+  }, [currentPage]);
+
   const parseMetricNumber = (value: string) => Number(value.replace(/[^0-9.]/g, '')) || 0;
   const filteredRankList = MOCK_RM_LIST
     .filter((rm) => (rankStatusFilter === 'all' ? true : rm.status === rankStatusFilter))
