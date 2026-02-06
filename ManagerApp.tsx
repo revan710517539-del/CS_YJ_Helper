@@ -449,6 +449,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
 }) => {
   const [optTask, oppTask, riskTask] = MOCK_TASKS;
   const recentOpportunities = managerOpportunities.slice(0, 4);
+  const baseUrl = import.meta.env.BASE_URL || '/';
   const [metricTab, setMetricTab] = useState<'core' | 'base' | 'other'>('core');
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
@@ -979,7 +980,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                             </button>
                           ) : (
                             <a
-                              href={`AI_customer_insight.html?customerName=${encodeURIComponent(customer.name)}`}
+                              href={`${baseUrl}AI_customer_insight.html?customerName=${encodeURIComponent(customer.name)}`}
                               className="text-[9px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest"
                             >
                               详情 →
@@ -1344,7 +1345,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                       </div>
                       <span className="text-center text-slate-200 font-bold">{item.customers}</span>
                       <a
-                        href="manager-dashboard.html"
+                        href={`${baseUrl}manager-dashboard.html`}
                         className="justify-self-end px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-[9px] font-black uppercase tracking-widest"
                       >
                         商机详情
@@ -1386,7 +1387,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                         </div>
                         <span className="text-center text-slate-200 font-bold">{item.customers}</span>
                         <a
-                          href="manager-dashboard.html"
+                          href={`${baseUrl}manager-dashboard.html`}
                           className="justify-self-end px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-[9px] font-black uppercase tracking-widest"
                         >
                           商机详情
@@ -1427,7 +1428,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                         </div>
                         <span className="text-center text-slate-200 font-bold">{item.customers}</span>
                         <a
-                          href="manager-dashboard.html"
+                          href={`${baseUrl}manager-dashboard.html`}
                           className="justify-self-end px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-[9px] font-black uppercase tracking-widest"
                         >
                           商机详情

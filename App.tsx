@@ -224,6 +224,7 @@ const App: React.FC = () => {
   const otherMetricPool = otherMetrics.map((metric) => metric.label);
 
   const [metricTab, setMetricTab] = useState<'core' | 'base' | 'other'>('core');
+  const baseUrl = import.meta.env.BASE_URL || '/';
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
   const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(otherMetrics[0].label);
@@ -1778,7 +1779,7 @@ const App: React.FC = () => {
         {currentPage === 'customer' && (
           <div className="p-0">
             <iframe 
-              src={`AI_customer_insight.html${selectedCustomerName ? `?customerName=${encodeURIComponent(selectedCustomerName)}` : ''}`} 
+              src={`${baseUrl}AI_customer_insight.html${selectedCustomerName ? `?customerName=${encodeURIComponent(selectedCustomerName)}` : ''}`} 
               style={{
                 width: '100%',
                 height: '100vh',
