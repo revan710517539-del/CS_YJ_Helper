@@ -1,0 +1,1601 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>常熟农商银行 - AI洞察</title>
+  <style>
+    :root{
+      --bg:#F5F7FB;
+      --card:#FFFFFF;
+      --line:#E9EDF6;
+      --text:#1F2A44;
+      --muted:#6B7895;
+      --blue:#2F66FF;
+      --blue-2:#3E7BFF;
+      --blue-3:#EAF1FF;
+      --tag:#EEF4FF;
+      --tag-text:#3A63D8;
+      --orange:#FF9A2E;
+      --orange-bg:#FFF2E2;
+      --shadow: 0 10px 30px rgba(31,42,68,.06);
+      --radius: 14px;
+      --radius2: 12px;
+      --font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:var(--bg);
+    }
+    a{color:inherit; text-decoration:none}
+    .app{
+      min-height:100vh;
+      display:flex;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:84px;
+      background:linear-gradient(180deg,#2F66FF 0%, #2B57F0 100%);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:10px 0;
+      gap:14px;
+      position:sticky;
+      top:0;
+      height:100vh;
+    }
+    .side-top{
+      width:64px;
+      height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      background:rgba(255,255,255,.14);
+      margin-top:6px;
+      font-weight:700;
+      letter-spacing:.5px;
+      font-size:13px;
+    }
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      width:100%;
+      align-items:center;
+      margin-top:6px;
+      padding:0 8px;
+    }
+    .nav-item{
+      width:64px;
+      height:58px;
+      border-radius:14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      color:rgba(255,255,255,.92);
+      cursor:pointer;
+      user-select:none;
+    }
+    .nav-item .lbl{
+      font-size:11px;
+      opacity:.92;
+      transform:translateY(-1px);
+    }
+    .nav-item svg{opacity:.95}
+    .nav-item.active{
+      background:rgba(255,255,255,.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+    }
+    .side-spacer{flex:1}
+    .side-bottom{
+      width:64px;
+      height:58px;
+      border-radius:14px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:rgba(255,255,255,.14);
+      margin-bottom:10px;
+    }
+
+    /* Main */
+    .main{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    /* Top header */
+    .topbar{
+      height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 22px 0 18px;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .brand-badge{
+      width:40px;height:40px;border-radius:10px;
+      background:#121212;
+      display:grid;place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .brand-badge:before{
+      content:"";
+      position:absolute; inset:-20px;
+      background:radial-gradient(circle at 30% 30%, #FFD55E 0%, rgba(255,213,94,.0) 55%);
+      transform:rotate(18deg);
+      opacity:.9;
+    }
+    .brand-badge svg{position:relative; z-index:1}
+    .brand-title{
+      display:flex; flex-direction:column; line-height:1.05;
+    }
+    .brand-title .cn{font-size:18px}
+    .brand-title .en{font-size:11px; color:var(--muted); font-weight:600; margin-top:4px}
+    .topbar-right{
+      display:flex; align-items:center; gap:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* Content container */
+    .content{
+      padding:18px 20px 26px;
+    }
+
+    .panel{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(233,237,246,.9);
+    }
+
+    /* Profile card */
+    .profile{
+      padding:16px 18px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+    .avatar{
+      width:44px;height:44px;border-radius:999px;
+      background:var(--blue-3);
+      display:grid;place-items:center;
+      flex:0 0 auto;
+      border:1px solid rgba(47,102,255,.12);
+    }
+    .profile-main{
+      flex:1;
+      min-width:0;
+    }
+    .p-row1{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .name{
+      font-weight:800;
+      font-size:16px;
+    }
+    .id{
+      color:#9AA6C0;
+      font-weight:700;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:2px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+      border:1px solid transparent;
+      line-height:18px;
+    }
+    .pill.orange{
+      background:var(--orange-bg);
+      color:#B25B00;
+      border-color:#FFE1BD;
+    }
+    .pill.blue{
+      background:var(--tag);
+      color:var(--tag-text);
+      border-color:#DCE8FF;
+    }
+    .p-row2{
+      margin-top:8px;
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+      align-items:center;
+    }
+    .meta{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .meta svg{opacity:.7}
+    .insight{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#F7F9FF;
+      border:1px solid #EEF2FF;
+      color:#506081;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .insight .tag-ai{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-weight:900;
+      color:#1F3FD6;
+      margin-right:8px;
+    }
+
+    /* Two column layout */
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap:14px;
+      align-items:start;
+    }
+    .left-stack{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .pair-row{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap:14px;
+      align-items:start;
+    }
+    .pair-row.split{
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .ai-profile-grid{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap:12px;
+    }
+    .ai-profile-grid .item{
+      margin:0;
+    }
+    .ai-profile-grid .bullet{
+      margin:6px 0 0;
+      padding-left:18px;
+    }
+
+    /* Left big card */
+    .card{
+      padding:14px 16px 16px;
+    }
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px 22px;
+      padding:2px 2px 10px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:12px;
+      overflow:visible;
+    }
+    .tab{
+      font-size:14px;
+      font-weight:800;
+      color:#6D7A97;
+      padding:8px 0;
+      position:relative;
+      white-space:nowrap;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.active{
+      color:#1F2A44;
+    }
+    .tab.active:after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:-11px;
+      height:3px;
+      border-radius:999px;
+      background:var(--blue);
+    }
+    .tabpane{
+      min-height:360px;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+      color:#1F3FD6;
+      margin:8px 0 6px;
+    }
+    .section-sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:10px;
+    }
+    .item{
+      background:#FBFCFF;
+      border:1px solid #EEF2FF;
+      border-radius:12px;
+      padding:12px 12px;
+      display:flex;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .item .ico{
+      width:26px;height:26px;border-radius:10px;
+      background:var(--blue-3);
+      display:grid;place-items:center;
+      border:1px solid rgba(47,102,255,.12);
+      flex:0 0 auto;
+    }
+    .item .txt{
+      flex:1;
+      min-width:0;
+    }
+    .item .txt .k{
+      font-weight:900;
+      margin-bottom:4px;
+      color:#2B3857;
+      font-size:13px;
+    }
+    .item .txt .v{
+      color:#5A6A8C;
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .tagrow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:18px 0 4px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      background:var(--tag);
+      color:var(--tag-text);
+      border:1px solid #DCE8FF;
+    }
+    .chip.orange{
+      background:var(--orange-bg);
+      color:#B25B00;
+      border-color:#FFE1BD;
+    }
+
+    .subcard{
+      margin-top:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 14px;
+      box-shadow:0 10px 20px rgba(31,42,68,.04);
+    }
+    .subcard h3{
+      margin:0 0 10px;
+      font-size:15px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:#1F3FD6;
+    }
+    .industry-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .industry-block{
+      background:#FBFCFF;
+      border:1px solid #EEF2FF;
+      border-radius:12px;
+      padding:10px 12px;
+    }
+    .industry-hd{
+      font-weight:900;
+      color:#1F2A44;
+      font-size:13px;
+      margin-bottom:6px;
+    }
+    .industry-list{
+      margin:0;
+      padding-left:16px;
+      color:#5A6A8C;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .industry-bars{
+      display:grid;
+      gap:10px;
+    }
+    .industry-metric{
+      font-size:12px;
+      font-weight:900;
+      color:#3F4D6B;
+    }
+    .industry-barlist{
+      display:grid;
+      gap:6px;
+    }
+    .industry-baritem{
+      display:grid;
+      grid-template-columns: 46px 1fr 40px;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      color:#5A6A8C;
+    }
+    .industry-track{
+      height:8px;
+      background:#EEF2FF;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .industry-fill{
+      height:100%;
+      border-radius:999px;
+    }
+    .industry-fill.c1{background:linear-gradient(90deg,#2F66FF,#6B8CFF)}
+    .industry-fill.c2{background:linear-gradient(90deg,#5C7CFF,#93A8FF)}
+    .industry-fill.c3{background:linear-gradient(90deg,#8BA5FF,#B9C7FF)}
+    .industry-table{
+      display:grid;
+      gap:6px;
+    }
+    .industry-row{
+      display:grid;
+      grid-template-columns: 70px 1.1fr 1.1fr 1.1fr;
+      align-items:center;
+      gap:8px;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px dashed #E6ECFF;
+      color:#5A6A8C;
+      font-size:12px;
+    }
+    .industry-row.industry-head{
+      font-weight:900;
+      color:#1F2A44;
+      background:#F3F6FF;
+      border:1px solid #E1E9FF;
+    }
+    .industry-ol{
+      margin:0;
+      padding-left:18px;
+      color:#5A6A8C;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .industry-rowline{
+      display:grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.92fr);
+      gap:14px;
+      justify-content:space-between;
+    }
+    @media (max-width: 980px){
+      .industry-rowline{
+        grid-template-columns: 1fr;
+      }
+    }
+    .insight-table-card{
+      background:#fff;
+      border:1px solid #E6EAF2;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 10px 24px rgba(31,42,68,.06);
+    }
+    .insight-table-card.wide-2-3{
+      width:66%;
+      justify-self:start;
+    }
+    @media (max-width: 980px){
+      .insight-table-card.wide-2-3{
+        width:100%;
+      }
+    }
+    .insight-table-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 14px;
+      background:#F5F6F8;
+      color:#1F2A44;
+      font-weight:900;
+      border-bottom:1px solid #E6EAF2;
+      font-size:13px;
+    }
+    .insight-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      font-size:12px;
+      color:#2B3857;
+    }
+    .insight-table th,
+    .insight-table td{
+      padding:10px 12px;
+      border-bottom:1px solid #E9EDF4;
+      border-right:1px solid #E9EDF4;
+      vertical-align:top;
+      line-height:1.6;
+    }
+    .insight-table th:last-child,
+    .insight-table td:last-child{
+      border-right:none;
+    }
+    .insight-table tr:last-child td{
+      border-bottom:none;
+    }
+    .insight-table thead th{
+      background:#F2F3F5;
+      font-weight:900;
+      color:#1F2A44;
+    }
+
+    .case{
+      cursor:pointer;
+    }
+    .chev-btn{
+      border:0;
+      background:transparent;
+      padding:4px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+    .chev-btn:hover{
+      background:#F0F4FF;
+    }
+
+    .case-drawer{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.45);
+      display:none;
+      align-items:stretch;
+      justify-content:flex-end;
+      z-index:999;
+    }
+    .case-drawer.open{
+      display:flex;
+    }
+    .case-panel{
+      width:360px;
+      max-width:92vw;
+      background:#fff;
+      height:100%;
+      padding:28px 24px;
+      box-shadow:-20px 0 40px rgba(15,23,42,.12);
+      border-left:1px solid #E6EAF2;
+      animation:caseSlideIn .28s ease-out;
+      overflow-y:auto;
+    }
+    @keyframes caseSlideIn{
+      from{transform:translateX(20px); opacity:.6;}
+      to{transform:translateX(0); opacity:1;}
+    }
+    .case-panel-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    .case-panel-title{
+      font-weight:900;
+      letter-spacing:.2em;
+      font-size:12px;
+      text-transform:uppercase;
+      color:#0F172A;
+      border-bottom:3px solid #2F66FF;
+      padding-bottom:6px;
+    }
+    .case-panel-close{
+      width:34px;height:34px;border-radius:12px;border:1px solid #E6EAF2;
+      display:grid;place-items:center;background:#fff;cursor:pointer;
+    }
+    .case-panel-close:hover{background:#F5F7FB}
+    .case-profile{
+      text-align:center;
+      margin:12px 0 18px;
+    }
+    .case-name-lg{
+      font-size:20px;
+      font-weight:900;
+      color:#0F172A;
+    }
+    .case-role{
+      font-size:11px;
+      font-weight:800;
+      color:#3B82F6;
+      letter-spacing:.4em;
+      margin-top:6px;
+    }
+    .case-tags-row{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top:12px;
+    }
+    .case-tag{
+      padding:4px 10px;
+      font-size:10px;
+      border-radius:999px;
+      border:1px solid #E6EAF2;
+      background:#F8FAFF;
+      font-weight:800;
+      color:#5B6B88;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .case-section{
+      margin-top:14px;
+    }
+    .case-section-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+      color:#0F172A;
+      font-size:12px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+    }
+    .case-section-title::before{
+      content:"";
+      width:4px;
+      height:14px;
+      background:#2F66FF;
+      border-radius:999px;
+    }
+    .case-section-card{
+      margin-top:8px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#F8FAFF;
+      border:1px solid #EEF2FF;
+      font-size:12px;
+      line-height:1.6;
+      color:#5A6A8C;
+      white-space:pre-line;
+    }
+
+    /* Product recommend list */
+    .prod{
+      border:1px solid #EEF2FF;
+      background:#FBFCFF;
+      border-radius:12px;
+      padding:12px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .prod .badge{
+      width:36px;height:36px;border-radius:14px;
+      background:linear-gradient(180deg,#FFC56E 0%, #FF9A2E 100%);
+      display:grid;place-items:center;
+      color:#fff;
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .prod .pinfo{flex:1; min-width:0}
+    .prod .pname{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      font-weight:900;
+      margin-bottom:6px;
+    }
+    .prod .pweight{
+      margin-left:auto;
+      font-size:12px;
+      font-weight:900;
+      color:#2F66FF;
+      background:#EAF1FF;
+      border:1px solid #DCE8FF;
+      padding:2px 8px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+    .mini-pill{
+      font-size:12px;
+      font-weight:900;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid #FFE1BD;
+      background:var(--orange-bg);
+      color:#B25B00;
+    }
+    .pdesc{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      margin-bottom:8px;
+    }
+    .pmeta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      color:#5A6A8C;
+      font-size:12.5px;
+      font-weight:700;
+      align-items:center;
+    }
+    .pmeta b{color:#1F2A44}
+    .pmeta .pos{color:#E14B4B; font-weight:900}
+    .preason{
+      margin-top:6px;
+      font-size:12.5px;
+      color:#6B7895;
+      line-height:1.55;
+    }
+
+    .note{
+      margin-top:12px;
+      padding:12px 12px;
+      border:1px solid #EEF2FF;
+      background:#F7F9FF;
+      border-radius:12px;
+      color:#506081;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .as-block .note + .note{
+      margin-top:18px;
+    }
+    .mini-chart{
+      display:flex;
+      align-items:flex-end;
+      gap:8px;
+      padding:10px 12px;
+      border:1px solid #E6EAF2;
+      background:#F7FAFF;
+      border-radius:12px;
+      margin-top:10px;
+    }
+    .mini-bar{
+      width:12px;
+      border-radius:6px 6px 3px 3px;
+      background:linear-gradient(180deg,#2F66FF 0%, #7CA5FF 100%);
+    }
+    .mini-bar.orange{
+      background:linear-gradient(180deg,#FF9A2E 0%, #FFC27A 100%);
+    }
+    .mini-bar.green{
+      background:linear-gradient(180deg,#4CCB9A 0%, #8BE0C1 100%);
+    }
+    .mini-legend{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:11px;
+      font-weight:700;
+      color:#6B7895;
+      margin-left:6px;
+      white-space:nowrap;
+    }
+    .note .head{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      font-weight:900;
+      color:#2B3857;
+      margin-bottom:8px;
+    }
+    .quote{
+      border-left:3px solid #D5E2FF;
+      padding-left:10px;
+      margin:8px 0 0;
+    }
+    .quote.combo{
+      background:#F1F6FF;
+      border-left-color:#2F66FF;
+      border-radius:10px;
+      padding:8px 12px;
+    }
+    .bullet{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:#506081;
+      font-size:12.5px;
+    }
+    .bullet li{margin:6px 0; line-height:1.6}
+    .subcard-compact .bullet{
+      font-size:13px;
+    }
+
+    /* Right assistant */
+    .assistant{
+      padding:12px 12px 14px;
+      position:static;
+      order:2;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .as-head{
+      background:linear-gradient(90deg,#EAF2FF 0%, #F3F7FF 60%, #FFFFFF 100%);
+      border:1px solid #E5EDFF;
+      border-radius:14px;
+      padding:12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .as-title{
+      font-weight:900;
+      color:#1F3FD6;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .bot{
+      width:34px;height:34px;border-radius:12px;
+      background:linear-gradient(180deg,#B9D3FF 0%, #7FB0FF 100%);
+      display:grid;place-items:center;
+      border:1px solid #B9D3FF;
+    }
+
+    .as-block-title{
+      font-weight:900;
+      color:#2B3857;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin:8px 0 10px;
+      font-size:14px;
+    }
+    .as-block{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:12px;
+      box-shadow:0 10px 20px rgba(31,42,68,.04);
+      margin-bottom:12px;
+    }
+
+    .as-par{
+      color:#506081;
+      font-size:13px;
+      line-height:1.65;
+      margin:0;
+    }
+    .as-par b{color:#1F2A44}
+    .as-steps{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:#506081;
+      font-size:13px;
+      line-height:1.65;
+    }
+    .as-steps li{margin:6px 0}
+    .btn{
+      margin-top:10px;
+      width:100%;
+      height:36px;
+      border-radius:10px;
+      border:1px solid #B7CBFF;
+      background:#fff;
+      color:#2F66FF;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn[disabled]{
+      cursor:not-allowed;
+      opacity:.6;
+    }
+    .btn-group{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+    }
+    .btn-group .btn{
+      margin-top:0;
+      flex:1;
+    }
+    .btn-adopt{
+      border-color:#E2E8F5;
+      background:#F6F8FC;
+      color:#7B88A8;
+    }
+    .btn-adopt.adopted{
+      border-color:#B7CBFF;
+      background:#EAF1FF;
+      color:#2F66FF;
+    }
+    .btn-adopt.adopted[disabled]{
+      opacity:1;
+    }
+
+    /* excellent cases */
+    .case{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border:1px solid #EEF2FF;
+      background:#FBFCFF;
+      border-radius:12px;
+      padding:10px 10px;
+      margin-bottom:8px;
+      gap:10px;
+    }
+    .case-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .case-num{
+      width:22px;height:22px;border-radius:999px;
+      background:#EAF1FF;
+      border:1px solid #DCE8FF;
+      color:#2F66FF;
+      display:grid;place-items:center;
+      font-weight:900;
+      font-size:12px;
+      flex:0 0 auto;
+    }
+    .case-name{
+      font-weight:900;
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:150px;
+    }
+    .case-tags{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .case-tags .chip{
+      padding:3px 8px;
+      font-size:11.5px;
+    }
+    .chev{
+      width:28px;height:28px;border-radius:10px;
+      display:grid;place-items:center;
+      color:#8EA0C5;
+      border:1px solid #EEF2FF;
+      background:#fff;
+      flex:0 0 auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px){
+      .grid{grid-template-columns: 1fr}
+      .assistant{position:relative; top:auto}
+    }
+    @media (max-width: 680px){
+      .sidebar{display:none}
+      .topbar{padding:0 14px}
+      .content{padding:14px}
+      .profile{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Main -->
+    <div class="main">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-badge" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M7 16c2 1 4 1 6 0 2-1 3-3 3-5 0-2-1-4-3-5-2-1-4-1-6 0 2 0 4 2 4 5s-2 5-4 5Z"
+                    fill="#FFD55E" opacity=".9"/>
+            </svg>
+          </div>
+          <div class="brand-title">
+            <div class="cn">常熟农商银行</div>
+            <div class="en">CHANGSHU RURAL COMMERCIAL BANK</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span>AI洞察</span>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- Profile -->
+        <section class="panel profile">
+          <div class="avatar" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="#2F66FF" stroke-width="2"/>
+              <path d="M4 21a8 8 0 0 1 16 0" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <div class="profile-main">
+            <div class="p-row1">
+              <div class="name" data-field="name">郭家豪</div>
+              <div class="id" data-field="id">ID:CSB001234567</div>
+              <span class="pill" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #DBEAFE;">本地</span>
+              <span class="pill blue">主账户客户</span>
+              <span class="pill orange" data-field="aum">AUM(月) 300.00万（季）</span>
+              <span class="pill blue" data-field="activity">近30天交易活跃度 85%</span>
+              <span class="pill blue" data-field="productPenetration">产品渗透率 68%</span>
+            </div>
+
+            <div class="p-row2">
+              <span class="meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" stroke="#6B7895" stroke-width="2"/>
+                  <path d="M12 12a2 2 0 1 0-2-2 2 2 0 0 0 2 2Z" fill="#6B7895"/>
+                </svg>
+                江苏省常熟市招商城片区
+              </span>
+              <span class="meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 7h16M7 3v4M17 3v4M6 11h12v10H6V11Z" stroke="#6B7895" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+                五金建材批发
+              </span>
+              <span class="meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M6.5 3h4l1 5-3 2a14 14 0 0 0 6.5 6.5l2-3 5 1v4c0 1.1-.9 2-2 2C10.6 21 3 13.4 3 4.9 3 3.9 3.8 3 4.8 3Z"
+                        stroke="#6B7895" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+                138****5678
+              </span>
+              <span class="meta" data-field="lastInteraction">最近互动 2天前</span>
+              <span class="meta" data-field="assetChange">资产变化 +45%</span>
+            </div>
+
+            <div class="insight">
+              <span class="tag-ai">
+                <span style="display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                  <span style="width:8px;height:8px;border-radius:999px;background:#2F66FF;display:block"></span>
+                </span>
+                AI财富顾问
+              </span>
+              <span data-field="reason">活跃度最高，近期资产增长45%</span>。
+              AUM(月) 300万，近30天交易活跃度85%，资产变化+45%；主账户留存本行，近2个月回款约260万，资金回笼集中。
+              <br/>跟进建议：方向“子女教育金”，身份“规划师”；产品组合“现金管理+7天短持+3个月固收”；风险提示“到期集中、同业分流”。
+            </div>
+          </div>
+        </section>
+
+        <!-- Two columns -->
+        <section class="grid">
+          <div class="left-stack">
+            <div class="pair-row">
+              <section class="panel card">
+                <h3>
+                  <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 3 14.5 9.5 21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z" fill="#2F66FF"/>
+                    </svg>
+                  </span>
+                  AI客户画像
+                </h3>
+                <div class="ai-profile-grid">
+                  <div class="item">
+                    <div class="ico" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="#2F66FF" stroke-width="2"/>
+                        <path d="M4 21a8 8 0 0 1 16 0" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div class="txt">
+                      <div class="k">身份定位：</div>
+                      <div class="v">常熟招商城小燕商户，主营五金建材批发，45岁。<br/>
+                        2018年在我行开户，结算用于回款收款，日交易流水10万左右。<br/>
+                        已接入“马上付”，持有理财4笔、保险1份。近期有两笔理财即将到期。</div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="ico" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 7h16M4 12h16M4 17h16" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div class="txt">
+                      <div class="k">潜在机会：</div>
+                      <div class="v">
+                        近2个月备货回款约260万，适合短持滚动承接。<br/>
+                        117期-A 将于2026/1/14到期，建议续作或替换。<br/>
+                        授信额度300万、用信160万，扩租预计新增需求200-300万。
+                      </div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="ico" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2 3 6.5V12c0 6 4 9.5 9 10 5-.5 9-4 9-10V6.5L12 2Z" stroke="#2F66FF" stroke-width="2" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="txt">
+                      <div class="k">风险偏好：</div>
+                      <div class="v">稳健偏保守（R1-R2为主），更关注流动性与本金安全；对中短期固收类接受度高，权益类低配置。</div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="ico" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 17.5 5 21l1.5-7L2 9.5l7.2-1L12 2l2.8 6.5 7.2 1-4.5 4.5 1.5 7-7-3.5Z"
+                              stroke="#2F66FF" stroke-width="2" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="txt">
+                      <div class="k">潜在风险：</div>
+                      <div class="v">跨行转账频繁（备注含“他行理财/大额存单”），若收益与权益不足易被同业吸引；经营淡季现金流波动，存在资金外流与产品提前赎回风险。</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel card">
+              <h3>
+                <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 7h10v10H7V7Z" stroke="#2F66FF" stroke-width="2"/>
+                    <path d="M9 3h6M9 21h6" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                AI产品推荐
+              </h3>
+
+              <div class="note" style="margin-top:0">
+                <div class="head">
+                  <span style="display:inline-grid;place-items:center;width:20px;height:20px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2 3 6.5V12c0 6 4 9.5 9 10 5-.5 9-4 9-10V6.5L12 2Z" stroke="#2F66FF" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  产品组合方案
+                </div>
+                <div class="quote combo" style="margin-top:8px">
+                  组合目标：兼顾流动性与阶段收益，并保留到期滚动空间。<br/>
+                  推荐理由：客户偏好短持与灵活取用，采用“现金管理+短持+中期固收”梯度配置，兼顾周转与收益。<br/>
+                  推荐话术：您可以先用现金类产品确保资金流动性，再通过7天短持产品滚动增加资金收益；最后，将确定不用的中期资金配置3个月固收理财。
+                </div>
+              </div>
+
+              <div class="prod">
+                <div class="badge">￥</div>
+                <div class="pinfo">
+                  <div class="pname">
+                    添利天天利66号 <span class="mini-pill">现金类产品</span>
+                    <span class="pweight">资产配比 50%</span>
+                  </div>
+                  <div class="pdesc">产品代码：9TTL966D · 工作日9:00-17:00申购，T+1起息，赎回T+1确认到账。</div>
+                  <div class="pmeta">
+                    <span>风险等级：<b>R1</b></span>
+                    <span>期限：<b>T+1</b></span>
+                    <span>近7日年化收益率：<span class="pos">1.59%</span></span>
+                  </div>
+                  <div class="preason">推荐理由：客户偏好高流动性与短持产品，可承接日常周转资金并提升闲置资金效率。</div>
+                </div>
+              </div>
+
+              <div class="prod">
+                <div class="badge">￥</div>
+                <div class="pinfo">
+                  <div class="pname">
+                    恒源灵动稳健持有7天16号G（1000元起） <span class="mini-pill">固收产品（短持型）</span>
+                    <span class="pweight">资产配比 30%</span>
+                  </div>
+                  <div class="pdesc">持有满7天后可赎回，每日可申赎，适合资金滚动管理。</div>
+                  <div class="pmeta">
+                    <span>风险等级：<b>R1</b></span>
+                    <span>期限：<b>7天</b></span>
+                    <span>业绩比较基准：<span class="pos">3.03%</span></span>
+                  </div>
+                  <div class="preason">推荐理由：客户有明显滚动投资倾向，7天短持便于衔接回款与采购节奏。</div>
+                </div>
+              </div>
+
+              <div class="prod">
+                <div class="badge">￥</div>
+                <div class="pinfo">
+                  <div class="pname">
+                    东吴人寿鑫得禧两全保险 <span class="mini-pill">保险类产品</span>
+                    <span class="pweight">资产配比 20%</span>
+                  </div>
+                  <div class="pdesc">产品代码：DWXDXX-2026 · 保障期限10年，期满给付生存金，身故/全残保障双重覆盖。</div>
+                  <div class="pmeta">
+                    <span>风险等级：<b>R2</b></span>
+                    <span>缴费方式：<b>分期</b></span>
+                    <span>保障期间：<b>10年</b></span>
+                  </div>
+                  <div class="preason">推荐理由：作为组合中的稳健底仓，兼顾保障与期满收益，适合中长期资金锁定与家庭保障需求。</div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <!-- Right -->
+          <aside class="panel assistant">
+            <div class="as-head">
+              <div class="as-title">
+                <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3 14.5 9.5 21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z" fill="#2F66FF"/>
+                  </svg>
+                </span>
+                AI待办
+              </div>
+              <div class="bot" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <rect x="6" y="8" width="12" height="10" rx="4" fill="white" opacity=".9"/>
+                  <path d="M9 12h.01M15 12h.01" stroke="#2F66FF" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M12 4v3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="4" r="1.3" fill="white"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="as-block">
+              <div class="note" style="margin-top:0">
+                <b>1. 电话更新风险评估信息</b><br/>
+                <span style="color:#6B7895">原因：</span>风险评估距上次已3年，近30天有2笔理财即将到期，账户信息缺项3项。<br/>
+                <span style="color:#6B7895">参考：</span>您好，我是常熟银行小李，您的风险评估已到期，需补全职业/住址等信息。全程5分钟视频认证即可完成，您下午3点方便吗？<br/>
+                <div class="btn-group">
+                  <button class="btn btn-generate" type="button">生成商机</button>
+                  <button class="btn btn-adopt" type="button" disabled>采纳</button>
+                </div>
+              </div>
+
+              <div class="note">
+                <b>2. 理财续期个性化产品方案</b><br/>
+                <span style="color:#6B7895">原因：</span>2笔理财合计约150万将在30天内到期，账户闲置现金约80万。<br/>
+                <span style="color:#6B7895">参考：</span>建议“稳健增值+灵活流动”组合：到期资金一部分转入一年定开锁定收益，另一部分配置7天短持备用。这样兼顾安全与流动性。<br/>
+                <div class="btn-group">
+                  <button class="btn btn-generate" type="button">生成商机</button>
+                  <button class="btn btn-adopt" type="button" disabled>采纳</button>
+                </div>
+              </div>
+
+              <div class="note">
+                <b>3. 周周乐活动推荐玩法</b><br/>
+                <span style="color:#6B7895">依据历史数据：</span>近8周参与率28%-32%，午休/周五晚高响应；“到店+转介绍”转化率高18%。<br/>
+                <span style="color:#6B7895">玩法建议：</span>“周五双倍积分+周末到店礼+转介绍加码”，分层触达。<br/>
+                <div class="btn-group">
+                  <button class="btn btn-generate" type="button">生成商机</button>
+                  <button class="btn btn-adopt" type="button" disabled>采纳</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="as-block">
+              <div class="as-block-title" style="margin-bottom:8px">
+                <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#FFF2E2;border:1px solid #FFE1BD;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3 4 7v10l8 4 8-4V7l-8-4Z" fill="#FF9A2E" opacity=".95"/>
+                  </svg>
+                </span>
+                优秀营销案例
+              </div>
+
+              <div class="case" data-name="王女士" data-role="财富顾问" data-tags="三年期到期转化, 重要型" data-basic="商机名称：三年期到期转化财富\n商机类型：重要型｜业务指标：理财业务｜拓展方向：负债财富\n达成路径：购买任意自营/代销理财｜状态：已触达转落地｜认领：已认领\n登记时间：2026-01-19｜到期时间：2026-04-30" data-preference="52岁，企业主，稳健偏保守，偏好三年期与封闭纯盈系列；关注本息安全与稳定现金流。" data-strategy="策略：推荐常乐智享三年期 + 稳利恒盈封闭纯盈系列，业务基准线2%-3%。\n执行：到期前7天电话触达，锁定续作额度，安排面谈与产品对比。" data-script="话术：\n“王女士您好，您这笔三年期资金将于4月到期，我帮您提前锁定一套更稳健的续作方案：主打常乐智享三年期，并搭配稳利恒盈封闭纯盈系列，收益目标区间2%-3%。到期当天无需跑多趟，我提前为您预留额度，您看明天上午方便电话确认吗？”" data-result="已预约理财，反馈链路完成（电话拜访→了解商机→反馈）；商机推进顺畅。" data-evidence="业务明细：2026-01-24 / 01-25 / 01-26 发生3笔个人活期结算存款回笼。\n沟通凭证：电话联系记录已留存（截图）。">
+                <div class="case-left">
+                  <div class="case-num">1</div>
+                  <div style="min-width:0">
+                    <div class="case-name">王女士 52岁</div>
+                    <div class="case-tags">
+                      <span class="chip">三年期到期转化</span>
+                      <span class="chip">重要型</span>
+                    </div>
+                    <div class="as-par" style="margin-top:6px">
+                      结合“到期转化+稳健收益”诉求，锁定续作节奏与资金回流窗口。
+                      <br/>策略：推荐常乐智享三年期 + 稳利恒盈封闭纯盈系列（基准线2%-3%）。
+                    </div>
+                  </div>
+                </div>
+                <button class="chev-btn" type="button" aria-label="查看案例详情">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 6l6 6-6 6" stroke="#8EA0C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="case" data-name="刘先生" data-role="财富顾问" data-tags="资金回笼高频, AUM(月) 600万" data-basic="50岁，经营稳定，资金周转频繁，关注现金流与资金灵活性。" data-preference="稳健型，偏好现金类与短持产品，风险承受能力中低，重视流动性。" data-strategy="策略：常乐智享三年期小额锁定 + 稳利恒盈封闭纯盈系列分层配置，业务基准线2%-3%。\n执行：以7天滚动产品做流动性缓冲，设置到期续作提醒。" data-script="话术：\n“刘先生您好，您近期资金回笼频率高，我建议‘短持滚动+中期锁定’组合：日常流动部分用7天滚动理财承接，核心资金配置常乐智享三年期与稳利恒盈封闭纯盈系列，收益目标2%-3%。这样既不耽误周转，又把收益稳稳锁住。”" data-result="客户明确分层配置意向，已完成电话触达与产品说明，进入预约阶段。" data-evidence="反馈列表：客户触达、了解商机、反馈记录完整。\n商机指标：理财业务，状态持续跟进中。">
+                <div class="case-left">
+                  <div class="case-num">2</div>
+                  <div style="min-width:0">
+                    <div class="case-name">刘先生 50岁</div>
+                    <div class="case-tags">
+                      <span class="chip">资金回笼高频</span>
+                      <span class="chip">AUM(月) 600万</span>
+                    </div>
+                    <div class="as-par" style="margin-top:6px">
+                      以“短持滚动+分层锁定”提升收益稳定性，同时保留充足流动性。
+                      <br/>策略：常乐智享三年期 + 稳利恒盈封闭纯盈系列（基准线2%-3%）。
+                    </div>
+                  </div>
+                </div>
+                <button class="chev-btn" type="button" aria-label="查看案例详情">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 6l6 6-6 6" stroke="#8EA0C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="case" style="margin-bottom:0" data-name="郭先生" data-role="财富顾问" data-tags="教育金&现金流, AUM(月) 300万" data-basic="45岁，五金建材商户，经营性现金流波动，家庭教育金与流动性需求并重。" data-preference="稳健偏保守，偏好短持与中期固收，关注本金安全与收益确定性。" data-strategy="策略：稳利恒盈封闭纯盈系列做中期收益底仓，叠加常乐智享三年期锁定稳定回报，业务基准线2%-3%。\n执行：按到期节奏滚动续作，优先匹配教育金刚性支出。" data-script="话术：\n“郭先生您好，考虑到您孩子教育金的刚性支出，我建议把教育金部分放在稳利恒盈封闭纯盈系列，中期稳健增值；再用常乐智享三年期锁定稳定收益，收益目标2%-3%。这样教育金安全性更高，到期也可按节点续作。”" data-result="已完成需求确认与商机导入，转化节奏明确，客户认可度高。" data-evidence="需求详情：标记“已预约理财”，触达记录完善。\n沟通凭证：电话联系截图已留存。">
+                <div class="case-left">
+                  <div class="case-num">3</div>
+                  <div style="min-width:0">
+                    <div class="case-name">郭先生 45岁</div>
+                    <div class="case-tags">
+                      <span class="chip">教育金&现金流</span>
+                      <span class="chip">AUM(月) 300万</span>
+                    </div>
+                    <div class="as-par" style="margin-top:6px">
+                      以教育金为主线，资金分层锁定，兼顾收益与流动性。
+                      <br/>策略：稳利恒盈封闭纯盈系列 + 常乐智享三年期（基准线2%-3%）。
+                    </div>
+                  </div>
+                </div>
+                <button class="chev-btn" type="button" aria-label="查看案例详情">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 6l6 6-6 6" stroke="#8EA0C5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="caseDrawer" class="case-drawer" aria-hidden="true">
+    <div class="case-panel" role="dialog" aria-modal="true" aria-label="客户案例详情">
+      <div class="case-panel-head">
+        <div class="case-panel-title">优秀营销案例详情</div>
+        <button class="case-panel-close" type="button" aria-label="关闭">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6l-12 12" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="case-profile">
+        <div class="case-name-lg" id="caseName">-</div>
+        <div class="case-role" id="caseRole">-</div>
+        <div class="case-tags-row" id="caseTags"></div>
+      </div>
+
+      <div class="case-section">
+        <div class="case-section-title">基本信息</div>
+        <div class="case-section-card" id="caseBasic">-</div>
+      </div>
+
+      <div class="case-section">
+        <div class="case-section-title">理财 / 风险偏好画像</div>
+        <div class="case-section-card" id="casePreference">-</div>
+      </div>
+
+      <div class="case-section">
+        <div class="case-section-title">应对策略</div>
+        <div class="case-section-card" id="caseStrategy">-</div>
+      </div>
+
+      <div class="case-section">
+        <div class="case-section-title">话术</div>
+        <div class="case-section-card" id="caseScript">-</div>
+      </div>
+
+      <div class="case-section" style="margin-bottom:6px">
+        <div class="case-section-title">取得的效果</div>
+        <div class="case-section-card" id="caseResult">-</div>
+      </div>
+
+      <div class="case-section" style="margin-bottom:6px">
+        <div class="case-section-title">关键凭证</div>
+        <div class="case-section-card" id="caseEvidence">-</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const reasonByIndex = [
+        "活跃度最高，近期资产增长45%",
+        "AUM(月)最大户，持有高端理财产品",
+        "产品渗透率最高，跨境理财需求强"
+      ];
+
+      const customers = [
+        {
+          id: "001234567",
+          name: "郭家豪",
+          aum: 300,
+          activity: 85,
+          assetChange: "+45%",
+          productPenetration: 68,
+          lastInteraction: "2天前"
+        },
+        {
+          id: "2",
+          name: "李女士",
+          aum: 1680,
+          activity: 62,
+          assetChange: "-3%",
+          productPenetration: 45,
+          lastInteraction: "5天前"
+        },
+        {
+          id: "3",
+          name: "王总",
+          aum: 3200,
+          activity: 92,
+          assetChange: "+28%",
+          productPenetration: 82,
+          lastInteraction: "今天"
+        },
+        {
+          id: "4",
+          name: "陈女士",
+          aum: 950,
+          activity: 38,
+          assetChange: "-8%",
+          productPenetration: 25,
+          lastInteraction: "10天前"
+        }
+      ].map((customer, index) => ({
+        ...customer,
+        reason: reasonByIndex[index] || "重点跟进客户"
+      }));
+
+      const params = new URLSearchParams(window.location.search);
+      const customerId = params.get("customerId");
+      const customerName = params.get("customerName");
+      const customer =
+        customers.find((item) => item.name === customerName)
+        || customers.find((item) => item.id === customerId)
+        || customers[0];
+
+      const formatAum = (aum) => Number(aum).toFixed(2);
+      const fieldMap = {
+        name: customer.name,
+        id: `ID:CSB${customer.id.padStart(6, "0")}`,
+        aum: `AUM(月) ${formatAum(customer.aum)}万`,
+        activity: `近30天交易活跃度 ${customer.activity}%`,
+        productPenetration: `产品渗透率 ${customer.productPenetration}%`,
+        lastInteraction: `最近互动 ${customer.lastInteraction}`,
+        assetChange: `资产变化 ${customer.assetChange}`,
+        reason: customer.reason
+      };
+
+      document.querySelectorAll("[data-field]").forEach((el) => {
+        const key = el.getAttribute("data-field");
+        if (key && fieldMap[key] !== undefined) {
+          el.textContent = fieldMap[key];
+        }
+      });
+    })();
+
+    // Tabs (simple, matches UI structure)
+    (function () {
+      const tabs = Array.from(document.querySelectorAll(".tab"));
+      const panes = Array.from(document.querySelectorAll(".tabpane"));
+
+      function activate(id){
+        tabs.forEach(t => {
+          const on = t.dataset.tab === id;
+          t.classList.toggle("active", on);
+          t.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        panes.forEach(p => {
+          p.style.display = (p.id === id) ? "" : "none";
+        });
+      }
+
+      tabs.forEach(t => t.addEventListener("click", () => activate(t.dataset.tab)));
+    })();
+
+    (function () {
+      const drawer = document.getElementById("caseDrawer");
+      const closeBtn = drawer?.querySelector(".case-panel-close");
+      const nameEl = document.getElementById("caseName");
+      const roleEl = document.getElementById("caseRole");
+      const tagsEl = document.getElementById("caseTags");
+      const basicEl = document.getElementById("caseBasic");
+      const prefEl = document.getElementById("casePreference");
+      const strategyEl = document.getElementById("caseStrategy");
+      const scriptEl = document.getElementById("caseScript");
+      const resultEl = document.getElementById("caseResult");
+      const evidenceEl = document.getElementById("caseEvidence");
+
+      if (!drawer || !nameEl || !roleEl || !tagsEl || !basicEl || !prefEl || !strategyEl || !scriptEl || !resultEl || !evidenceEl) {
+        return;
+      }
+
+      const openDrawer = (caseEl) => {
+        const tags = (caseEl.dataset.tags || "").split(",").map((t) => t.trim()).filter(Boolean);
+        nameEl.textContent = caseEl.dataset.name || "-";
+        roleEl.textContent = caseEl.dataset.role || "-";
+        tagsEl.innerHTML = tags.map((tag) => `<span class="case-tag">${tag}</span>`).join("");
+        basicEl.textContent = caseEl.dataset.basic || "-";
+        prefEl.textContent = caseEl.dataset.preference || "-";
+        strategyEl.textContent = caseEl.dataset.strategy || "-";
+        scriptEl.textContent = caseEl.dataset.script || "-";
+        resultEl.textContent = caseEl.dataset.result || "-";
+        evidenceEl.textContent = caseEl.dataset.evidence || "-";
+        drawer.classList.add("open");
+        drawer.setAttribute("aria-hidden", "false");
+      };
+
+      const closeDrawer = () => {
+        drawer.classList.remove("open");
+        drawer.setAttribute("aria-hidden", "true");
+      };
+
+      document.querySelectorAll(".case").forEach((caseEl) => {
+        caseEl.addEventListener("click", () => openDrawer(caseEl));
+      });
+
+      closeBtn?.addEventListener("click", closeDrawer);
+      drawer.addEventListener("click", (event) => {
+        if (event.target === drawer) {
+          closeDrawer();
+        }
+      });
+    })();
+
+    (function () {
+      const notes = document.querySelectorAll(".note");
+      notes.forEach((note) => {
+        const generateBtn = note.querySelector(".btn-generate");
+        const adoptBtn = note.querySelector(".btn-adopt");
+        if (!generateBtn || !adoptBtn) {
+          return;
+        }
+        adoptBtn.disabled = true;
+
+        generateBtn.addEventListener("click", () => {
+          adoptBtn.textContent = "已采纳";
+          adoptBtn.classList.add("adopted");
+          adoptBtn.disabled = true;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
