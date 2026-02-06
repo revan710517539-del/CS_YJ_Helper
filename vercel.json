@@ -1,0 +1,7 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/AI_customer_insight", "destination": "/AI_customer_insight.html" },
+    { "source": "/manager-dashboard", "destination": "/manager-dashboard.html" }
+  ]
+}
