@@ -236,7 +236,7 @@ const App: React.FC = () => {
   const customerInsightBaseUrl = `${baseUrl}AI_customer_insight.html`;
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
-  const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(otherMetrics[0].label);
+  const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(otherMetrics[0]?.label ?? '');
   const [selectedRM, setSelectedRM] = useState<RelationshipManager | null>(null);
   const [reportPeriod, setReportPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day');
   const [rankScope, setRankScope] = useState<'region' | 'bank'>('region');
@@ -327,7 +327,7 @@ const App: React.FC = () => {
     };
   }, [currentPage, customerInsightLoaded, customerInsightUrl, customerInsightSrcDoc]);
 
-  const parseMetricNumber = (value: string) => Number(value.replace(/[^0-9.]/g, '')) || 0;
+  const parseMetricNumber = (value: unknown) => Number(String(value ?? '').replace(/[^0-9.]/g, '')) || 0;
   const filteredRankList = MOCK_RM_LIST
     .filter((rm) => (rankStatusFilter === 'all' ? true : rm.status === rankStatusFilter))
     .slice()
@@ -365,8 +365,8 @@ const App: React.FC = () => {
       }
       return a.warning.rate - b.warning.rate;
     });
-  const loggedInManager = selectedManager ?? MOCK_RM_LIST[0];
-  const loggedInManagerId = loggedInManager.id;
+  const loggedInManager = selectedManager ?? MOCK_RM_LIST[0] ?? null;
+  const loggedInManagerId = loggedInManager?.id ?? 'unknown-manager';
   const branchMetricStorageKey = `branch-metric-pool-${loggedInManagerId}`;
   const refreshManagerMetricSelections = () => {
     try {
@@ -424,13 +424,17 @@ const App: React.FC = () => {
       setSelectedOtherMetricKey(otherMetricSelection[0]);
     }
   }, [otherMetricSelection, selectedOtherMetricKey]);
-  const isLoggedInTopThree = filteredRankList.slice(0, 3).some((rm) => rm.id === loggedInManager.id);
+  const isLoggedInTopThree = loggedInManager
+    ? filteredRankList.slice(0, 3).some((rm) => rm.id === loggedInManager.id)
+    : false;
   const rankListWithoutLoggedIn = isLoggedInTopThree
     ? filteredRankList
-    : filteredRankList.filter((rm) => rm.id !== loggedInManager.id);
+    : filteredRankList.filter((rm) => rm.id !== loggedInManager?.id);
   const displayRankList = isLoggedInTopThree
     ? rankListWithoutLoggedIn
-    : [...rankListWithoutLoggedIn, loggedInManager];
+    : loggedInManager
+    ? [...rankListWithoutLoggedIn, loggedInManager]
+    : rankListWithoutLoggedIn;
   const reportPeriodLabel = reportPeriod === 'day' ? '当日' : reportPeriod === 'week' ? '本周' : reportPeriod === 'month' ? '本月' : '本年';
   const rateLabel = reportPeriod === 'day' || reportPeriod === 'week' ? '月目标达成率' : '年目标达成率';
   const selectedMetricKey = metricTab === 'core'
@@ -507,10 +511,12 @@ const App: React.FC = () => {
     '银燕': { to: '金燕', count: '860人' },
     '小燕': { to: '银燕', count: '1,280人' },
   };
-  const formatNumberWithUnit = (value: string) => {
-    const match = value.match(/^([0-9]+(?:\.[0-9]+)?)(.*)$/);
+  const asText = (value: unknown) => String(value ?? '');
+  const formatNumberWithUnit = (value: unknown) => {
+    const text = asText(value);
+    const match = text.match(/^([0-9]+(?:\.[0-9]+)?)(.*)$/);
     if (!match) {
-      return value;
+      return text;
     }
     const [, num, unit] = match;
     const [intPart, decimalPart] = num.split('.');
@@ -548,7 +554,7 @@ const App: React.FC = () => {
   };
   const retentionOpportunity = supervisionOpportunities[0];
   const upgradeOpportunity = supervisionOpportunities[1];
-  const getCustomersCount = (value: string) => Number(value.replace(/[^0-9]/g, '')) || 0;
+  const getCustomersCount = (value: unknown) => Number(asText(value).replace(/[^0-9]/g, '')) || 0;
   const getPriorityValue = (id: string) => priorityOverrides[id] ?? 'important';
   const handlePriorityChange = (id: string, value: 'important' | 'nonimportant') => {
     if (value === 'nonimportant') {
@@ -1684,42 +1690,11 @@ const App: React.FC = () => {
                 <div className="h-16 flex items-center relative overflow-visible">
                   <div className="flex items-center gap-3 w-full">
                     <div
-                      className={`h-10 border border-slate-200 bg-gradient-to-r ${row.tone} flex items-center justify-between text-[11px] font-black shadow-sm px-2`}
+                      className={`h-10 border border-slate-200 bg-gradient-to-r ${row.tone} flex items-center justify-center gap-1 text-[11px] font-black shadow-sm px-2 whitespace-nowrap`}
                       style={{ width: `${row.width}px`, clipPath: 'polygon(0 0, 88% 0, 100% 100%, 0 100%)' }}
                     >
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenMigrationInfo(
-                              openMigrationInfo?.label === row.label && openMigrationInfo?.type === 'upgrade'
-                                ? null
-                                : { label: row.label, type: 'upgrade' }
-                            )
-                          }
-                          className="text-[10px] font-black text-slate-700 hover:text-blue-600"
-                        >
-                          （{row.label === '尊燕' ? '预警' : '待跃迁'}{row.pendingUpgrade}人）
-                        </button>
-                      </div>
-                      <span className={row.label === '小燕' ? 'mx-auto' : ''}>{row.label}</span>
-                      {!['尊燕', '小燕'].includes(row.label) && (
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setOpenMigrationInfo(
-                                openMigrationInfo?.label === row.label && openMigrationInfo?.type === 'downgrade'
-                                  ? null
-                                  : { label: row.label, type: 'downgrade' }
-                              )
-                            }
-                            className="text-[10px] font-black text-slate-700 hover:text-rose-600"
-                          >
-                            （{row.pendingDowngrade}人）
-                          </button>
-                        </div>
-                      )}
+                      <span className="text-[9px] font-bold text-slate-600">待跃迁{row.pendingUpgrade}人</span>
+                      <span>{row.label}</span>
                     </div>
                   </div>
                   {openMigrationInfo?.label === row.label && openMigrationInfo?.type === 'upgrade' && (
@@ -1784,9 +1759,9 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-center whitespace-nowrap">
-                      <div className="font-bold text-slate-700 whitespace-nowrap">{formatNumberWithUnit(row.aumLocal.replace('AUM(月):', '').trim())}</div>
-                      <div className={`text-[10px] whitespace-nowrap ${row.aumLocalDelta.includes('↓') ? 'text-emerald-600' : 'text-rose-500'}`}>
-                        {row.aumLocalDelta}
+                      <div className="font-bold text-slate-700 whitespace-nowrap">{formatNumberWithUnit(asText(row.aumLocal).replace('AUM(月):', '').trim())}</div>
+                      <div className={`text-[10px] whitespace-nowrap ${asText(row.aumLocalDelta).includes('↓') ? 'text-emerald-600' : 'text-rose-500'}`}>
+                        {asText(row.aumLocalDelta)}
                       </div>
                     </div>
                     <div className="text-center whitespace-nowrap">
@@ -1810,9 +1785,9 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-center whitespace-nowrap">
-                      <div className="font-bold text-slate-700 whitespace-nowrap">{formatNumberWithUnit(row.aumBank.replace('AUM(月):', '').trim())}</div>
-                      <div className={`text-[10px] whitespace-nowrap ${row.aumBankDelta.includes('↓') ? 'text-emerald-600' : 'text-rose-500'}`}>
-                        {row.aumBankDelta}
+                      <div className="font-bold text-slate-700 whitespace-nowrap">{formatNumberWithUnit(asText(row.aumBank).replace('AUM(月):', '').trim())}</div>
+                      <div className={`text-[10px] whitespace-nowrap ${asText(row.aumBankDelta).includes('↓') ? 'text-emerald-600' : 'text-rose-500'}`}>
+                        {asText(row.aumBankDelta)}
                       </div>
                     </div>
                     <div className="text-center whitespace-nowrap">

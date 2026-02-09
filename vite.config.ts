@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3223,
         host: '0.0.0.0',
-        strictPort: false,
+        strictPort: true,
       },
       plugins: [react({ fastRefresh: false })],
       define: {
