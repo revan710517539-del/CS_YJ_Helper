@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { OpportunityItem, RelationshipManager } from './types';
 import { ICONS, COLORS } from './constants';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -181,6 +181,14 @@ const CORE_METRIC_RATES = {
   },
 } as const;
 
+const getInitialPage = (): 'overview' | 'manager' | 'customer' => {
+  const page = new URLSearchParams(window.location.search).get('page');
+  if (page === 'overview' || page === 'manager' || page === 'customer') {
+    return page;
+  }
+  return 'overview';
+};
+
 const App: React.FC = () => {
   const otherMetrics = [
     {
@@ -225,6 +233,7 @@ const App: React.FC = () => {
 
   const [metricTab, setMetricTab] = useState<'core' | 'base' | 'other'>('core');
   const baseUrl = import.meta.env.BASE_URL || '/';
+  const customerInsightBaseUrl = `${baseUrl}AI_customer_insight.html`;
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
   const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(otherMetrics[0].label);
@@ -232,7 +241,7 @@ const App: React.FC = () => {
   const [reportPeriod, setReportPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day');
   const [rankScope, setRankScope] = useState<'region' | 'bank'>('region');
   const [rankStatusFilter, setRankStatusFilter] = useState<'all' | 'normal' | 'warning' | 'critical'>('all');
-  const [currentPage, setCurrentPage] = useState<'overview' | 'manager' | 'customer'>('overview');
+  const [currentPage, setCurrentPage] = useState<'overview' | 'manager' | 'customer'>(getInitialPage);
   const [selectedManager, setSelectedManager] = useState<RelationshipManager | null>(MOCK_RM_LIST[0]);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string | null>(null);
   const [managerOpportunities, setManagerOpportunities] = useState<Record<string, OpportunityItem[]>>({});
@@ -249,14 +258,25 @@ const App: React.FC = () => {
   const [managerMetricSelections, setManagerMetricSelections] = useState<Record<string, { name: string; region: string; base: string[]; other: string[] }>>({});
   const [openMetricSelectionLabel, setOpenMetricSelectionLabel] = useState<string | null>(null);
   const [openMigrationInfo, setOpenMigrationInfo] = useState<{ label: string; type: 'upgrade' | 'downgrade' } | null>(null);
+  const [customerInsightLoadError, setCustomerInsightLoadError] = useState<string | null>(null);
+  const [customerInsightLoaded, setCustomerInsightLoaded] = useState<boolean>(false);
+  const [customerInsightTemplate, setCustomerInsightTemplate] = useState<string | null>(null);
+  const [customerInsightTemplateError, setCustomerInsightTemplateError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const page = params.get('page');
-    if (page === 'overview' || page === 'manager' || page === 'customer') {
-      setCurrentPage(page);
-    }
-  }, []);
+  const customerInsightUrl = `${customerInsightBaseUrl}${selectedCustomerName ? `?customerName=${encodeURIComponent(selectedCustomerName)}` : ''}`;
+  const customerInsightSrcDoc = useMemo(() => {
+    if (!customerInsightTemplate) return null;
+    if (!selectedCustomerName) return customerInsightTemplate;
+    const safeCustomerName = JSON.stringify(selectedCustomerName);
+    const withCustomerVar = customerInsightTemplate.replace(
+      '</head>',
+      `<script>window.__CUSTOMER_NAME__=${safeCustomerName};</script></head>`
+    );
+    return withCustomerVar.replace(
+      'const customerName = params.get("customerName");',
+      'const customerName = params.get("customerName") || window.__CUSTOMER_NAME__ || null;'
+    );
+  }, [customerInsightTemplate, selectedCustomerName]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -264,6 +284,48 @@ const App: React.FC = () => {
     const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
     window.history.replaceState(null, '', newUrl);
   }, [currentPage]);
+
+  useEffect(() => {
+    if (currentPage !== 'customer') return;
+    setCustomerInsightLoadError(null);
+    setCustomerInsightLoaded(false);
+  }, [currentPage, selectedCustomerName]);
+
+  useEffect(() => {
+    if (currentPage !== 'customer') return;
+    let cancelled = false;
+    fetch(customerInsightBaseUrl, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`failed to fetch customer insight template: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then((html) => {
+        if (cancelled) return;
+        setCustomerInsightTemplate(html);
+        setCustomerInsightTemplateError(null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCustomerInsightTemplate(null);
+        setCustomerInsightTemplateError('智能客户洞察模板读取失败，已自动切换为直连加载。');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPage, customerInsightBaseUrl]);
+
+  useEffect(() => {
+    if (currentPage !== 'customer' || customerInsightLoaded) return;
+    const timer = window.setTimeout(() => {
+      setCustomerInsightLoadError((previous) => previous || '智能客户洞察页面加载超时，请点击下方按钮在新窗口打开。');
+    }, 5000);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [currentPage, customerInsightLoaded, customerInsightUrl, customerInsightSrcDoc]);
 
   const parseMetricNumber = (value: string) => Number(value.replace(/[^0-9.]/g, '')) || 0;
   const filteredRankList = MOCK_RM_LIST
@@ -1637,7 +1699,7 @@ const App: React.FC = () => {
                           }
                           className="text-[10px] font-black text-slate-700 hover:text-blue-600"
                         >
-                          （待{row.label === '尊燕' ? '降级' : '跃迁'}{row.pendingUpgrade}人）
+                          （{row.label === '尊燕' ? '预警' : '待跃迁'}{row.pendingUpgrade}人）
                         </button>
                       </div>
                       <span className={row.label === '小燕' ? 'mx-auto' : ''}>{row.label}</span>
@@ -1654,7 +1716,7 @@ const App: React.FC = () => {
                             }
                             className="text-[10px] font-black text-slate-700 hover:text-rose-600"
                           >
-                            （待降级{row.pendingDowngrade}人）
+                            （{row.pendingDowngrade}人）
                           </button>
                         </div>
                       )}
@@ -1792,9 +1854,24 @@ const App: React.FC = () => {
 
         {/* 页面3: 智能客户洞察 */}
         {currentPage === 'customer' && (
-          <div className="p-0">
+          <div className="p-0 relative">
             <iframe 
-              src={`${baseUrl}AI_customer_insight.html${selectedCustomerName ? `?customerName=${encodeURIComponent(selectedCustomerName)}` : ''}`} 
+              src={customerInsightSrcDoc ? undefined : customerInsightUrl}
+              srcDoc={customerInsightSrcDoc || undefined}
+              onLoad={(event) => {
+                setCustomerInsightLoaded(true);
+                const frameDoc = event.currentTarget.contentDocument;
+                if (!frameDoc) return;
+                const validTitle = frameDoc.title.includes('AI洞察');
+                const hasCustomerField = Boolean(frameDoc.querySelector('[data-field="name"]'));
+                if (!validTitle && !hasCustomerField) {
+                  setCustomerInsightLoadError('智能客户洞察页面加载异常，请点击下方按钮在新窗口打开。');
+                }
+              }}
+              onError={() => {
+                setCustomerInsightLoaded(true);
+                setCustomerInsightLoadError('智能客户洞察页面加载失败，请点击下方按钮在新窗口打开。');
+              }}
               style={{
                 width: '100%',
                 height: '100vh',
@@ -1803,6 +1880,29 @@ const App: React.FC = () => {
               }}
               title="AI Customer Insight"
             />
+            {!customerInsightLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 text-sm font-bold text-slate-500">
+                智能客户洞察页面加载中...
+              </div>
+            )}
+            {customerInsightTemplateError && (
+              <div className="absolute left-6 top-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-700 shadow">
+                {customerInsightTemplateError}
+              </div>
+            )}
+            {customerInsightLoadError && (
+              <div className="absolute left-6 bottom-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-700 shadow">
+                <div>{customerInsightLoadError}</div>
+                <a
+                  href={customerInsightUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex rounded-lg border border-amber-300 px-3 py-1 text-[11px] font-black text-amber-800 hover:bg-amber-100"
+                >
+                  在新窗口打开客户洞察
+                </a>
+              </div>
+            )}
           </div>
         )}
 

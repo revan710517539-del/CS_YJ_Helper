@@ -10,9 +10,9 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3223,
         host: '0.0.0.0',
-        strictPort: true,
+        strictPort: false,
       },
-      plugins: [react()],
+      plugins: [react({ fastRefresh: false })],
       define: {
         'process.env.API_KEY': JSON.stringify(apiKey),
         'process.env.GEMINI_API_KEY': JSON.stringify(apiKey)

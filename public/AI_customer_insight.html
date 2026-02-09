@@ -770,6 +770,122 @@
       color:#6B7895;
       line-height:1.55;
     }
+    .product-title{
+      margin:0 0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .product-title .left{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+      color:#1F2A44;
+      font-size:16px;
+    }
+    .batch-btn{
+      border:1px solid #CFE0FF;
+      background:#F3F7FF;
+      color:#2F66FF;
+      border-radius:999px;
+      padding:6px 12px;
+      font-size:12px;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+      touch-action:none;
+      transition:all .2s ease;
+      white-space:nowrap;
+    }
+    .batch-btn:hover{
+      background:#EAF1FF;
+      border-color:#BBD2FF;
+    }
+    .batch-btn.pressing{
+      background:#2F66FF;
+      color:#fff;
+      border-color:#2F66FF;
+      box-shadow:0 8px 18px rgba(47,102,255,.25);
+    }
+    .batch-action{
+      position:relative;
+      display:inline-flex;
+      flex-direction:column;
+      align-items:flex-end;
+    }
+    .voice-popover{
+      position:absolute;
+      right:0;
+      top:calc(100% + 8px);
+      width:300px;
+      max-width:78vw;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid #E6EAF2;
+      box-shadow:0 14px 30px rgba(15,23,42,.15);
+      padding:12px;
+      display:none;
+      z-index:20;
+    }
+    .voice-popover.open{
+      display:block;
+    }
+    .voice-title{
+      font-size:13px;
+      font-weight:900;
+      color:#0F172A;
+      margin-bottom:6px;
+    }
+    .voice-bars{
+      height:32px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      gap:4px;
+      margin:8px 0 10px;
+      padding:6px 8px;
+      border-radius:10px;
+      background:#F3F7FF;
+      border:1px solid #DFE9FF;
+    }
+    .voice-bar{
+      width:5px;
+      height:8px;
+      border-radius:99px;
+      background:#2F66FF;
+      opacity:.9;
+      transform-origin:bottom;
+    }
+    .voice-popover.recording .voice-bar{
+      animation:voiceBar 1s infinite ease-in-out;
+    }
+    .voice-popover.recording .voice-bar:nth-child(1){animation-delay:.0s}
+    .voice-popover.recording .voice-bar:nth-child(2){animation-delay:.1s}
+    .voice-popover.recording .voice-bar:nth-child(3){animation-delay:.2s}
+    .voice-popover.recording .voice-bar:nth-child(4){animation-delay:.15s}
+    .voice-popover.recording .voice-bar:nth-child(5){animation-delay:.25s}
+    .voice-popover.recording .voice-bar:nth-child(6){animation-delay:.05s}
+    .voice-popover.recording .voice-bar:nth-child(7){animation-delay:.18s}
+    @keyframes voiceBar{
+      0%{height:8px; opacity:.65}
+      50%{height:26px; opacity:1}
+      100%{height:10px; opacity:.7}
+    }
+    .voice-status{
+      font-size:12px;
+      color:#5A6A8C;
+      line-height:1.5;
+      text-align:left;
+    }
+    .voice-tip{
+      margin-top:6px;
+      font-size:11px;
+      color:#94A3B8;
+      font-weight:700;
+      text-align:left;
+    }
 
     .note{
       margin-top:12px;
@@ -1174,14 +1290,33 @@
             </div>
 
             <section class="panel card">
-              <h3>
-                <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 7h10v10H7V7Z" stroke="#2F66FF" stroke-width="2"/>
-                    <path d="M9 3h6M9 21h6" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
+              <h3 class="product-title">
+                <span class="left">
+                  <span style="display:inline-grid;place-items:center;width:22px;height:22px;border-radius:8px;background:#EAF1FF;border:1px solid #DCE8FF;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M7 7h10v10H7V7Z" stroke="#2F66FF" stroke-width="2"/>
+                      <path d="M9 3h6M9 21h6" stroke="#2F66FF" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </span>
+                  AI产品推荐
                 </span>
-                AI产品推荐
+                <div class="batch-action">
+                  <button id="swapBatchBtn" class="batch-btn" type="button">换一批（长按）</button>
+                  <div id="voiceInputPopover" class="voice-popover" aria-hidden="true">
+                    <div class="voice-title">语音录入</div>
+                    <div class="voice-bars" aria-hidden="true">
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                      <span class="voice-bar"></span>
+                    </div>
+                    <div id="voiceInputStatus" class="voice-status">按住按钮并说出偏好，例如：偏保守、要高流动性、想要教育金配置。</div>
+                    <div id="voiceInputTip" class="voice-tip">松开后停止录音并自动优化推荐</div>
+                  </div>
+                </div>
               </h3>
 
               <div class="note" style="margin-top:0">
@@ -1193,63 +1328,14 @@
                   </span>
                   产品组合方案
                 </div>
-                <div class="quote combo" style="margin-top:8px">
+                <div class="quote combo" id="productComboQuote" style="margin-top:8px">
                   组合目标：兼顾流动性与阶段收益，并保留到期滚动空间。<br/>
                   推荐理由：客户偏好短持与灵活取用，采用“现金管理+短持+中期固收”梯度配置，兼顾周转与收益。<br/>
                   推荐话术：您可以先用现金类产品确保资金流动性，再通过7天短持产品滚动增加资金收益；最后，将确定不用的中期资金配置3个月固收理财。
                 </div>
               </div>
 
-              <div class="prod">
-                <div class="badge">￥</div>
-                <div class="pinfo">
-                  <div class="pname">
-                    添利天天利66号 <span class="mini-pill">现金类产品</span>
-                    <span class="pweight">资产配比 50%</span>
-                  </div>
-                  <div class="pdesc">产品代码：9TTL966D · 工作日9:00-17:00申购，T+1起息，赎回T+1确认到账。</div>
-                  <div class="pmeta">
-                    <span>风险等级：<b>R1</b></span>
-                    <span>期限：<b>T+1</b></span>
-                    <span>近7日年化收益率：<span class="pos">1.59%</span></span>
-                  </div>
-                  <div class="preason">推荐理由：客户偏好高流动性与短持产品，可承接日常周转资金并提升闲置资金效率。</div>
-                </div>
-              </div>
-
-              <div class="prod">
-                <div class="badge">￥</div>
-                <div class="pinfo">
-                  <div class="pname">
-                    恒源灵动稳健持有7天16号G（1000元起） <span class="mini-pill">固收产品（短持型）</span>
-                    <span class="pweight">资产配比 30%</span>
-                  </div>
-                  <div class="pdesc">持有满7天后可赎回，每日可申赎，适合资金滚动管理。</div>
-                  <div class="pmeta">
-                    <span>风险等级：<b>R1</b></span>
-                    <span>期限：<b>7天</b></span>
-                    <span>业绩比较基准：<span class="pos">3.03%</span></span>
-                  </div>
-                  <div class="preason">推荐理由：客户有明显滚动投资倾向，7天短持便于衔接回款与采购节奏。</div>
-                </div>
-              </div>
-
-              <div class="prod">
-                <div class="badge">￥</div>
-                <div class="pinfo">
-                  <div class="pname">
-                    东吴人寿鑫得禧两全保险 <span class="mini-pill">保险类产品</span>
-                    <span class="pweight">资产配比 20%</span>
-                  </div>
-                  <div class="pdesc">产品代码：DWXDXX-2026 · 保障期限10年，期满给付生存金，身故/全残保障双重覆盖。</div>
-                  <div class="pmeta">
-                    <span>风险等级：<b>R2</b></span>
-                    <span>缴费方式：<b>分期</b></span>
-                    <span>保障期间：<b>10年</b></span>
-                  </div>
-                  <div class="preason">推荐理由：作为组合中的稳健底仓，兼顾保障与期满收益，适合中长期资金锁定与家庭保障需求。</div>
-                </div>
-              </div>
+              <div id="productList"></div>
             </section>
           </div>
           <!-- Right -->
@@ -1280,7 +1366,7 @@
                 <span style="color:#6B7895">参考：</span>您好，我是常熟银行小李，您的风险评估已到期，需补全职业/住址等信息。全程5分钟视频认证即可完成，您下午3点方便吗？<br/>
                 <div class="btn-group">
                   <button class="btn btn-generate" type="button">生成商机</button>
-                  <a class="btn btn-adopt" href="https://csaidemo2.vercel.app/" target="_blank" rel="noopener noreferrer">拜访登记</a>
+                  <a class="btn btn-adopt" href="#" target="_blank" rel="noopener noreferrer">拜访登记</a>
                 </div>
               </div>
 
@@ -1290,7 +1376,7 @@
                 <span style="color:#6B7895">参考：</span>建议“稳健增值+灵活流动”组合：到期资金一部分转入一年定开锁定收益，另一部分配置7天短持备用。这样兼顾安全与流动性。<br/>
                 <div class="btn-group">
                   <button class="btn btn-generate" type="button">生成商机</button>
-                  <a class="btn btn-adopt" href="https://csaidemo2.vercel.app/" target="_blank" rel="noopener noreferrer">拜访登记</a>
+                  <a class="btn btn-adopt" href="#" target="_blank" rel="noopener noreferrer">拜访登记</a>
                 </div>
               </div>
 
@@ -1300,7 +1386,7 @@
                 <span style="color:#6B7895">玩法建议：</span>“周五双倍积分+周末到店礼+转介绍加码”，分层触达。<br/>
                 <div class="btn-group">
                   <button class="btn btn-generate" type="button">生成商机</button>
-                  <a class="btn btn-adopt" href="https://csaidemo2.vercel.app/" target="_blank" rel="noopener noreferrer">拜访登记</a>
+                  <a class="btn btn-adopt" href="#" target="_blank" rel="noopener noreferrer">拜访登记</a>
                 </div>
               </div>
             </div>
@@ -1438,6 +1524,8 @@
   </div>
 
   <script>
+    const VISIT_REGISTRATION_URL = "https://csaidemo2.vercel.app/?page=customer";
+
     (function () {
       const reasonByIndex = [
         "活跃度最高，近期资产增长45%",
@@ -1535,6 +1623,331 @@
     })();
 
     (function () {
+      const comboQuote = document.getElementById("productComboQuote");
+      const productList = document.getElementById("productList");
+      const swapBatchBtn = document.getElementById("swapBatchBtn");
+      const voicePopover = document.getElementById("voiceInputPopover");
+      const voiceStatus = document.getElementById("voiceInputStatus");
+      const voiceTip = document.getElementById("voiceInputTip");
+      if (!comboQuote || !productList || !swapBatchBtn || !voicePopover || !voiceStatus || !voiceTip) {
+        return;
+      }
+
+      const productBatches = [
+        {
+          combo: "组合目标：兼顾流动性与阶段收益，并保留到期滚动空间。<br/>推荐理由：客户偏好短持与灵活取用，采用“现金管理+短持+中期固收”梯度配置，兼顾周转与收益。<br/>推荐话术：您可以先用现金类产品确保资金流动性，再通过7天短持产品滚动增加资金收益；最后，将确定不用的中期资金配置3个月固收理财。",
+          items: [
+            {
+              name: "添利天天利66号",
+              category: "现金类产品",
+              weight: "资产配比 50%",
+              desc: "产品代码：9TTL966D · 工作日9:00-17:00申购，T+1起息，赎回T+1确认到账。",
+              risk: "R1",
+              term: "T+1",
+              metricLabel: "近7日年化收益率",
+              metricValue: "1.59%",
+              reason: "客户偏好高流动性与短持产品，可承接日常周转资金并提升闲置资金效率。"
+            },
+            {
+              name: "恒源灵动稳健持有7天16号G（1000元起）",
+              category: "固收产品（短持型）",
+              weight: "资产配比 30%",
+              desc: "持有满7天后可赎回，每日可申赎，适合资金滚动管理。",
+              risk: "R1",
+              term: "7天",
+              metricLabel: "业绩比较基准",
+              metricValue: "3.03%",
+              reason: "客户有明显滚动投资倾向，7天短持便于衔接回款与采购节奏。"
+            },
+            {
+              name: "东吴人寿鑫得禧两全保险",
+              category: "保险类产品",
+              weight: "资产配比 20%",
+              desc: "产品代码：DWXDXX-2026 · 保障期限10年，期满给付生存金，身故/全残保障双重覆盖。",
+              risk: "R2",
+              term: "10年",
+              metricLabel: "缴费方式",
+              metricValue: "分期",
+              reason: "作为组合中的稳健底仓，兼顾保障与期满收益，适合中长期资金锁定与家庭保障需求。"
+            }
+          ]
+        },
+        {
+          combo: "组合目标：应对回款高峰并降低资金闲置。<br/>推荐理由：将中短期资金拆分为“高流动+票息增强+保障兜底”，平衡安全性和收益。<br/>推荐话术：先把最近要用的钱放在高流动产品，后续1-3个月可锁定票息收益，家庭长期资金再做保障型配置。",
+          items: [
+            {
+              name: "常盈活钱宝A款",
+              category: "现金管理",
+              weight: "资产配比 45%",
+              desc: "支持工作日快速申赎，结算账户可自动回流，适配日常经营周转。",
+              risk: "R1",
+              term: "T+1",
+              metricLabel: "近7日年化收益率",
+              metricValue: "1.72%",
+              reason: "提高经营现金流弹性，便于随时补货和支付供应商款项。"
+            },
+            {
+              name: "稳利恒盈封闭纯盈系列90天",
+              category: "固收产品（中短期）",
+              weight: "资产配比 35%",
+              desc: "封闭期90天，收益波动低，适配阶段性闲置资金。",
+              risk: "R2",
+              term: "90天",
+              metricLabel: "业绩比较基准",
+              metricValue: "3.26%",
+              reason: "利用回款窗口期提升收益确定性，避免短期大额资金空转。"
+            },
+            {
+              name: "康悦家和终身寿险",
+              category: "保障型保险",
+              weight: "资产配比 20%",
+              desc: "支持长期保障与资产传承，保障责任覆盖更完整。",
+              risk: "R2",
+              term: "长期",
+              metricLabel: "缴费方式",
+              metricValue: "年缴",
+              reason: "为家庭长期资产提供稳定底仓，分散经营波动带来的不确定性。"
+            }
+          ]
+        },
+        {
+          combo: "组合目标：稳住本金并提升到期续作效率。<br/>推荐理由：围绕“到期理财续作+教育金准备”双目标配置，兼顾短期周转与中长期规划。<br/>推荐话术：即将到期的理财先做阶梯续作，教育金部分单独管理，确保到期节点可控、收益连续。",
+          items: [
+            {
+              name: "日日盈增利11号",
+              category: "现金类产品",
+              weight: "资产配比 40%",
+              desc: "申购门槛低，赎回机制灵活，适合高频交易客户短期停泊。",
+              risk: "R1",
+              term: "T+1",
+              metricLabel: "近7日年化收益率",
+              metricValue: "1.65%",
+              reason: "保持充足流动性，覆盖月底采购和临时资金需求。"
+            },
+            {
+              name: "常乐智享三年期A",
+              category: "固收产品（中长期）",
+              weight: "资产配比 40%",
+              desc: "3年期稳健策略，适合锁定中期收益目标。",
+              risk: "R2",
+              term: "3年",
+              metricLabel: "业绩比较基准",
+              metricValue: "3.48%",
+              reason: "承接到期资金，增强中长期收益稳定性。"
+            },
+            {
+              name: "悦享教育金年金险",
+              category: "年金保险",
+              weight: "资产配比 20%",
+              desc: "教育金节点领取明确，可匹配子女升学时间规划。",
+              risk: "R2",
+              term: "8-10年",
+              metricLabel: "缴费方式",
+              metricValue: "期缴",
+              reason: "把教育金目标单独管理，降低因经营资金波动造成的挤占风险。"
+            }
+          ]
+        }
+      ];
+
+      let batchIndex = 0;
+      let isRecording = false;
+      let mediaRecorder = null;
+      let mediaStream = null;
+      let speechRecognizer = null;
+      let recognizedText = "";
+      let durationTicker = null;
+      let recordStartedAt = 0;
+      let closePopoverTimer = null;
+
+      const renderBatch = (index) => {
+        const batch = productBatches[index % productBatches.length];
+        comboQuote.innerHTML = batch.combo;
+        productList.innerHTML = batch.items.map((item) => `
+          <div class="prod">
+            <div class="badge">￥</div>
+            <div class="pinfo">
+              <div class="pname">
+                ${item.name} <span class="mini-pill">${item.category}</span>
+                <span class="pweight">${item.weight}</span>
+              </div>
+              <div class="pdesc">${item.desc}</div>
+              <div class="pmeta">
+                <span>风险等级：<b>${item.risk}</b></span>
+                <span>期限：<b>${item.term}</b></span>
+                <span>${item.metricLabel}：<span class="pos">${item.metricValue}</span></span>
+              </div>
+              <div class="preason">推荐理由：${item.reason}</div>
+            </div>
+          </div>
+        `).join("");
+      };
+
+      const openVoicePopover = () => {
+        if (closePopoverTimer) {
+          window.clearTimeout(closePopoverTimer);
+          closePopoverTimer = null;
+        }
+        voicePopover.classList.add("open");
+        voicePopover.setAttribute("aria-hidden", "false");
+      };
+
+      const closeVoicePopover = () => {
+        voicePopover.classList.remove("open");
+        voicePopover.classList.remove("recording");
+        voicePopover.setAttribute("aria-hidden", "true");
+      };
+
+      const scheduleClosePopover = (delay = 2200) => {
+        if (closePopoverTimer) {
+          window.clearTimeout(closePopoverTimer);
+        }
+        closePopoverTimer = window.setTimeout(() => {
+          closeVoicePopover();
+          closePopoverTimer = null;
+        }, delay);
+      };
+
+      const classifyTranscript = (text) => {
+        const content = String(text || "").toLowerCase();
+        const hitAny = (keywords) => keywords.some((word) => content.includes(word));
+        if (hitAny(["教育", "孩子", "学费", "升学", "年金"])) return 2;
+        if (hitAny(["流动", "周转", "现金", "短期", "灵活", "快赎"])) return 1;
+        if (hitAny(["保障", "保险", "传承", "养老"])) return 1;
+        if (hitAny(["收益", "稳健", "到期", "续作", "三年"])) return 2;
+        return (batchIndex + 1) % productBatches.length;
+      };
+
+      const setRecommendationByTranscript = (transcript) => {
+        const targetIndex = classifyTranscript(transcript);
+        batchIndex = targetIndex;
+        renderBatch(batchIndex);
+      };
+
+      const startSpeechRecognition = () => {
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Recognition) return;
+        speechRecognizer = new Recognition();
+        speechRecognizer.lang = "zh-CN";
+        speechRecognizer.interimResults = true;
+        speechRecognizer.maxAlternatives = 1;
+        speechRecognizer.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map((result) => result[0] && result[0].transcript ? result[0].transcript : "")
+            .join("")
+            .trim();
+          if (transcript) {
+            recognizedText = transcript;
+            voiceStatus.textContent = `识别中：${transcript}`;
+          }
+        };
+        speechRecognizer.onerror = () => {
+          // 浏览器禁用语音识别时，依然保留录音流程并使用兜底文案。
+        };
+        speechRecognizer.start();
+      };
+
+      const startVoiceInput = async () => {
+        openVoicePopover();
+        voicePopover.classList.add("recording");
+        voiceStatus.textContent = "录音中，请描述您的产品偏好...";
+        voiceTip.textContent = "松开按钮后停止录音并生成推荐";
+        recognizedText = "";
+        recordStartedAt = Date.now();
+        durationTicker = window.setInterval(() => {
+          const seconds = Math.max(1, Math.floor((Date.now() - recordStartedAt) / 1000));
+          if (!recognizedText) {
+            voiceStatus.textContent = `录音中（${seconds}s），请继续按住并说话...`;
+          }
+        }, 1000);
+
+        startSpeechRecognition();
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+          voiceTip.textContent = "当前浏览器不支持本地录音，系统将仅基于识别结果推荐。";
+          return;
+        }
+
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(mediaStream);
+          mediaRecorder.start();
+        } catch (error) {
+          voiceTip.textContent = "未获得麦克风权限，系统将使用已识别文本推荐。";
+        }
+      };
+
+      const stopVoiceInput = () => {
+        if (durationTicker) {
+          window.clearInterval(durationTicker);
+          durationTicker = null;
+        }
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+        mediaRecorder = null;
+        if (mediaStream) {
+          mediaStream.getTracks().forEach((track) => track.stop());
+        }
+        mediaStream = null;
+        if (speechRecognizer) {
+          try {
+            speechRecognizer.stop();
+          } catch (error) {
+            // ignore
+          }
+        }
+        speechRecognizer = null;
+      };
+
+      const handlePressStart = (event) => {
+        event.preventDefault();
+        if (isRecording) return;
+        isRecording = true;
+        if (typeof swapBatchBtn.setPointerCapture === "function") {
+          try {
+            swapBatchBtn.setPointerCapture(event.pointerId);
+          } catch (error) {
+            // ignore capture failure
+          }
+        }
+        swapBatchBtn.classList.add("pressing");
+        startVoiceInput();
+      };
+
+      const handlePressEnd = (event) => {
+        event.preventDefault();
+        if (!isRecording) return;
+        isRecording = false;
+        swapBatchBtn.classList.remove("pressing");
+        stopVoiceInput();
+
+        const fallbackTranscript = "稳健收益+高流动性";
+        const finalTranscript = (recognizedText || "").trim() || fallbackTranscript;
+        voicePopover.classList.remove("recording");
+        voiceStatus.textContent = `识别结果：${finalTranscript}`;
+        setRecommendationByTranscript(finalTranscript);
+        voiceTip.textContent = "已根据语音指令自动调整推荐内容";
+        scheduleClosePopover();
+      };
+
+      renderBatch(batchIndex);
+      swapBatchBtn.addEventListener("pointerdown", handlePressStart);
+      swapBatchBtn.addEventListener("pointerup", handlePressEnd);
+      swapBatchBtn.addEventListener("pointercancel", handlePressEnd);
+      window.addEventListener("blur", () => {
+        if (!isRecording) return;
+        isRecording = false;
+        swapBatchBtn.classList.remove("pressing");
+        stopVoiceInput();
+        voicePopover.classList.remove("recording");
+        voiceStatus.textContent = "录音已中断，请重新按住按钮录入。";
+        voiceTip.textContent = "松开后可继续自动推荐";
+        scheduleClosePopover(1800);
+      });
+    })();
+
+    (function () {
       const drawer = document.getElementById("caseDrawer");
       const closeBtn = drawer?.querySelector(".case-panel-close");
       const nameEl = document.getElementById("caseName");
@@ -1591,12 +2004,11 @@
         if (!generateBtn || !adoptBtn) {
           return;
         }
-        adoptBtn.disabled = true;
+        adoptBtn.href = VISIT_REGISTRATION_URL;
 
         generateBtn.addEventListener("click", () => {
           adoptBtn.textContent = "已采纳";
           adoptBtn.classList.add("adopted");
-          adoptBtn.disabled = true;
         });
       });
     })();

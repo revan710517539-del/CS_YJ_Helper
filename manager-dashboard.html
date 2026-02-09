@@ -21,20 +21,15 @@
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "recharts": "https://esm.sh/recharts@^3.6.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
-  }
-}
-</script>
 <link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <div id="root"></div>
-<script type="module" src="/manager-index.tsx"></script>
+    <script>
+      const target = new URL(window.location.href);
+      target.pathname = target.pathname.replace(/manager-dashboard\.html$/, '');
+      target.searchParams.set('page', 'manager');
+      window.location.replace(target.toString());
+    </script>
 </body>
 </html>
