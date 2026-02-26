@@ -450,7 +450,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
   const [optTask, oppTask, riskTask] = MOCK_TASKS;
   const recentOpportunities = managerOpportunities.slice(0, 4);
   const baseUrl = import.meta.env.BASE_URL || '/';
-  const [metricTab, setMetricTab] = useState<'core' | 'base' | 'other'>('core');
+  const [metricTab, setMetricTab] = useState<'core' | 'base'>('core');
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
   const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(OTHER_METRICS[0].name);
@@ -468,9 +468,9 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [showBaseMetricPool, setShowBaseMetricPool] = useState<boolean>(false);
   const [showOtherMetricPool, setShowOtherMetricPool] = useState<boolean>(false);
-  const [baseMetricSelection, setBaseMetricSelection] = useState<string[]>([...BASE_METRIC_POOL]);
+  const [baseMetricSelection, setBaseMetricSelection] = useState<string[]>([...BASE_METRIC_POOL, ...OTHER_METRIC_POOL]);
   const [otherMetricSelection, setOtherMetricSelection] = useState<string[]>([...OTHER_METRIC_POOL]);
-  const [baseMetricDraft, setBaseMetricDraft] = useState<string[]>([...BASE_METRIC_POOL]);
+  const [baseMetricDraft, setBaseMetricDraft] = useState<string[]>([...BASE_METRIC_POOL, ...OTHER_METRIC_POOL]);
   const [otherMetricDraft, setOtherMetricDraft] = useState<string[]>([...OTHER_METRIC_POOL]);
   const [branchDispatchRows, setBranchDispatchRows] = useState([
     { id: 'branch-1', name: '高净值续作跟进', source: '支行分派', customers: '16户', supervisionId: 'retention-1' },
@@ -546,9 +546,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
   }, [otherMetricSelection, selectedOtherMetricKey]);
   const selectedMetricKey = metricTab === 'core'
     ? selectedCoreMetricKey
-    : metricTab === 'base'
-    ? selectedBaseMetricKey
-    : selectedOtherMetricKey;
+    : selectedBaseMetricKey;
   const coreTrendData = reportPeriod === 'day'
     ? CORE_METRICS_TREND_DAY
     : reportPeriod === 'week'
@@ -588,9 +586,9 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
     birthdayCount: metric.birthdayCount,
     birthdayTarget: metric.birthdayTarget,
   }));
-  const baseMetrics = allBaseMetrics.filter((metric) => baseMetricSelection.includes(metric.label));
+  const baseMetrics = [...allBaseMetrics.filter((metric) => baseMetricSelection.includes(metric.label)), ...allOtherMetrics.filter((metric) => baseMetricSelection.includes(metric.label))];
   const otherMetrics = allOtherMetrics.filter((metric) => otherMetricSelection.includes(metric.label));
-  const currentMetrics = metricTab === 'core' ? coreMetrics : metricTab === 'base' ? baseMetrics : otherMetrics;
+  const currentMetrics = metricTab === 'core' ? coreMetrics : baseMetrics;
   const findCoreMetric = (label: string) => coreMetrics.find((metric) => metric.label === label);
   const formatCoreSummaryValue = (label: string) => {
     const metric = findCoreMetric(label);
@@ -659,14 +657,14 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
   };
   const anomalyCoreMetrics = coreMetrics.filter((metric) => metric.type !== 'success');
   const bestCoreMetric = [...coreMetrics].sort((a, b) => b.rate - a.rate)[0];
-  const trendSeries = metricTab === 'core' ? coreTrendData : metricTab === 'base' ? baseTrendData : otherTrendData;
+  const trendSeries = metricTab === 'core' ? coreTrendData : baseTrendData;
   const trendKey = selectedMetricKey;
   const trendDelta = trendSeries.length >= 2
     ? Number(trendSeries[trendSeries.length - 1][trendKey]) - Number(trendSeries[trendSeries.length - 2][trendKey])
     : 0;
   const trendDirection = trendDelta >= 0 ? '上行' : '回落';
   const trendMagnitude = `${Math.abs(trendDelta).toFixed(1)}${getTrendUnit(trendKey)}`;
-  const handleTabClick = (tab: 'core' | 'base' | 'other') => {
+  const handleTabClick = (tab: 'core' | 'base') => {
     setMetricTab(tab);
   };
   const formatCoreMetricValue = (label: string, value: number) => {
@@ -1039,16 +1037,6 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                   >
                     基础指标表现
                   </button>
-                  <button
-                    onClick={() => handleTabClick('other')}
-                    className={`py-3 px-6 text-xs font-black tracking-widest uppercase transition-all whitespace-nowrap ${
-                      metricTab === 'other'
-                        ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                        : 'text-slate-400 hover:text-slate-600'
-                    }`}
-                  >
-                    其他关键指标表现
-                  </button>
                   <div className="flex-1"></div>
                   <div className="flex items-center pr-4">
                     <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-full">
@@ -1076,19 +1064,14 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            if (metricTab === 'base') {
-                              setBaseMetricDraft(baseMetricSelection);
-                              setShowBaseMetricPool((prev) => !prev);
-                            } else {
-                              setOtherMetricDraft(otherMetricSelection);
-                              setShowOtherMetricPool((prev) => !prev);
-                            }
+                            setBaseMetricDraft(baseMetricSelection);
+                            setShowBaseMetricPool((prev) => !prev);
                           }}
                           className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all"
                         >
                           指标池
                         </button>
-                        {metricTab === 'base' && showBaseMetricPool && (
+                        {showBaseMetricPool && (
                           <div className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-3 shadow-xl z-20">
                             <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">选择指标</div>
                             <div className="space-y-2">
@@ -1100,10 +1083,6 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                                       type="checkbox"
                                       checked={checked}
                                       onChange={() => {
-                                        if (!checked && otherMetricSelection.includes(label)) {
-                                          window.alert('指标重复');
-                                          return;
-                                        }
                                         setBaseMetricDraft((prev) =>
                                           checked ? prev.filter((item) => item !== label) : [...prev, label]
                                         );
@@ -1143,78 +1122,21 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
                             </div>
                           </div>
                         )}
-                        {metricTab === 'other' && showOtherMetricPool && (
-                          <div className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-3 shadow-xl z-20">
-                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">选择指标</div>
-                            <div className="space-y-2">
-                              {[...BASE_METRIC_POOL, ...OTHER_METRIC_POOL].map((label) => {
-                                const checked = otherMetricDraft.includes(label);
-                                return (
-                                  <label key={label} className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                                    <input
-                                      type="checkbox"
-                                      checked={checked}
-                                      onChange={() => {
-                                        if (!checked && baseMetricSelection.includes(label)) {
-                                          window.alert('指标重复');
-                                          return;
-                                        }
-                                        setOtherMetricDraft((prev) =>
-                                          checked ? prev.filter((item) => item !== label) : [...prev, label]
-                                        );
-                                      }}
-                                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200"
-                                    />
-                                    <span>{label}</span>
-                                  </label>
-                                );
-                              })}
-                            </div>
-                            <div className="mt-3 flex items-center justify-between">
-                              <span className="text-[10px] text-slate-400 font-bold">
-                                已选 {otherMetricDraft.length} 项
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowOtherMetricPool(false)}
-                                  className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200 text-slate-500 hover:bg-slate-50"
-                                >
-                                  取消
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={otherMetricDraft.length === 0}
-                                  onClick={handleSaveOtherMetricPool}
-                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                                    otherMetricDraft.length === 0
-                                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                                  }`}
-                                >
-                                  一键保存
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="p-4 bg-white">
-                  <div className={`grid gap-3 ${metricTab === 'other' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-3'}`}>
+                  <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
                     {currentMetrics.map((item) => (
                       <button
                         key={item.label}
                         onClick={() => {
                           if (metricTab === 'core') {
                             setSelectedCoreMetricKey(item.label);
-                          } else if (metricTab === 'base') {
-                            setSelectedBaseMetricKey(item.label);
                           } else {
-                            setSelectedOtherMetricKey(item.label);
+                            setSelectedBaseMetricKey(item.label);
                           }
                         }}
                         className={`text-left p-3 rounded-xl border transition-colors bg-white/80 hover:shadow-md flex flex-col gap-2 ${selectedMetricKey === item.label ? 'ring-2 ring-blue-300' : ''}`}
@@ -1280,7 +1202,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
               <div className="mb-3">
                 <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center">
                   <span className="w-1.5 h-2.5 bg-blue-600 rounded-full mr-2"></span>
-                  {metricTab === 'core' ? '核心指标趋势' : metricTab === 'base' ? '基础指标趋势' : '其他指标趋势'}
+                  {metricTab === 'core' ? '核心指标趋势' : '基础指标趋势'}
                   <span className="ml-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
                     {reportPeriodLabel}
                   </span>
@@ -1288,7 +1210,7 @@ const ManagerApp: React.FC<ManagerAppProps> = ({
               </div>
               <div className="h-[180px] min-h-[180px] w-full bg-slate-50 rounded-lg p-3 border border-slate-100 flex-1">
                 <ResponsiveContainer width="100%" height="100%" minHeight={180} minWidth={0}>
-                  <LineChart data={metricTab === 'core' ? coreTrendData : metricTab === 'base' ? baseTrendData : otherTrendData}>
+                  <LineChart data={metricTab === 'core' ? coreTrendData : baseTrendData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                     <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 9, fontWeight: '900'}} />
                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 8, fontWeight: '900'}} />

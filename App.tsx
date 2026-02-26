@@ -228,15 +228,16 @@ const App: React.FC = () => {
       birthdayTarget: '1场/月',
     },
   ];
-  const baseMetricPool = ['零售客户数', '理财余额', '储蓄余额', '新开卡客户数'];
+  const baseMetricPool = ['零售客户数', '理财余额', '储蓄余额', '新开卡客户数', ...otherMetrics.map((metric) => metric.label)];
   const otherMetricPool = otherMetrics.map((metric) => metric.label);
 
-  const [metricTab, setMetricTab] = useState<'core' | 'base' | 'other'>('core');
+  const [metricTab, setMetricTab] = useState<'core' | 'base'>('core');
   const baseUrl = import.meta.env.BASE_URL || '/';
   const customerInsightBaseUrl = `${baseUrl}AI_customer_insight.html`;
   const [selectedCoreMetricKey, setSelectedCoreMetricKey] = useState<string>('财富中收');
   const [selectedBaseMetricKey, setSelectedBaseMetricKey] = useState<string>('零售客户数');
   const [selectedOtherMetricKey, setSelectedOtherMetricKey] = useState<string>(otherMetrics[0]?.label ?? '');
+  // otherMetricSelection is kept for localStorage compat but merged into baseMetricSelection for display
   const [selectedRM, setSelectedRM] = useState<RelationshipManager | null>(null);
   const [reportPeriod, setReportPeriod] = useState<'day' | 'week' | 'month' | 'year'>('day');
   const [rankScope, setRankScope] = useState<'region' | 'bank'>('region');
@@ -439,9 +440,7 @@ const App: React.FC = () => {
   const rateLabel = reportPeriod === 'day' || reportPeriod === 'week' ? '月目标达成率' : '年目标达成率';
   const selectedMetricKey = metricTab === 'core'
     ? selectedCoreMetricKey
-    : metricTab === 'base'
-    ? selectedBaseMetricKey
-    : selectedOtherMetricKey;
+    : selectedBaseMetricKey;
   const coreTrendData = reportPeriod === 'day'
     ? CORE_METRICS_TREND_DAY
     : reportPeriod === 'week'
@@ -607,16 +606,18 @@ const App: React.FC = () => {
     { label: '新开卡客户数', current: { day: '29户', week: '178户', month: '1,210户', year: '8,640户' }[reportPeriod], target: { day: '36户', week: '190户', month: '1,300户', year: '9,200户' }[reportPeriod], score: 78, type: 'warning' },
   ];
   const baseMetrics = allBaseMetrics.filter((metric) => baseMetricSelection.includes(metric.label));
-  const filteredOtherMetrics = otherMetrics.filter((metric) => otherMetricSelection.includes(metric.label));
+  const filteredOtherMetrics = otherMetrics.filter((metric) => baseMetricSelection.includes(metric.label));
+  const mergedBaseMetrics = [
+    ...baseMetrics,
+    ...filteredOtherMetrics.map((item) => ({
+      ...item,
+      current: item.current[reportPeriod] ?? item.current.day,
+      target: item.target[reportPeriod] ?? item.target.day,
+    })),
+  ];
   const currentMetrics = metricTab === 'core'
     ? coreMetrics
-    : metricTab === 'base'
-    ? baseMetrics
-    : filteredOtherMetrics.map((item) => ({
-        ...item,
-        current: item.current[reportPeriod] ?? item.current.day,
-        target: item.target[reportPeriod] ?? item.target.day,
-      }));
+    : mergedBaseMetrics;
   const renderMetricHelp = (label: string) => (
     <span
       className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-slate-300 text-[9px] font-black text-slate-500 bg-white cursor-pointer"
@@ -666,7 +667,7 @@ const App: React.FC = () => {
 
 
   // 当切换 tab 时清空已选指标，避免残留导致趋势图空白
-  const handleTabClick = (tab: 'core' | 'base' | 'other') => {
+  const handleTabClick = (tab: 'core' | 'base') => {
     setMetricTab(tab);
   };
 
@@ -852,12 +853,6 @@ const App: React.FC = () => {
                   >
                     基础指标表现
                   </button>
-                  <button 
-                    onClick={() => handleTabClick('other')}
-                    className={`py-3 px-6 text-xs font-black tracking-widest uppercase transition-all whitespace-nowrap ${metricTab === 'other' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
-                  >
-                    其他关键指标表现
-                  </button>
                   <div className="flex-1"></div>
                   <div className="flex items-center pr-4">
                     <div className="flex items-center gap-1 bg-slate-200/80 p-1 rounded-full">
@@ -885,13 +880,8 @@ const App: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            if (metricTab === 'base') {
-                              setBaseMetricDraft(baseMetricSelection);
-                              setShowBaseMetricPool((prev) => !prev);
-                            } else {
-                              setOtherMetricDraft(otherMetricSelection);
-                              setShowOtherMetricPool((prev) => !prev);
-                            }
+                            setBaseMetricDraft(baseMetricSelection);
+                            setShowBaseMetricPool((prev) => !prev);
                           }}
                           className="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border border-blue-200 text-blue-600 hover:bg-blue-50 transition-all"
                         >
@@ -982,91 +972,6 @@ const App: React.FC = () => {
                             </div>
                           </div>
                         )}
-                        {metricTab === 'other' && showOtherMetricPool && (
-                          <div className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-3 shadow-xl z-20">
-                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">选择指标</div>
-                            <div className="space-y-2">
-                              {otherMetricPool.map((label) => {
-                                const checked = otherMetricDraft.includes(label);
-                                const count = getMetricSelectionCount(label);
-                                return (
-                                  <div key={label} className="flex items-center justify-between text-[11px] font-bold text-slate-600">
-                                    <label className="flex items-center gap-2">
-                                      <input
-                                        type="checkbox"
-                                        checked={checked}
-                                        onChange={() => {
-                                          setOtherMetricDraft((prev) =>
-                                            checked ? prev.filter((item) => item !== label) : [...prev, label]
-                                          );
-                                        }}
-                                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-200"
-                                      />
-                                      <span>{label}</span>
-                                    </label>
-                                    <div className="relative">
-                                      <button
-                                        type="button"
-                                        onClick={() => setOpenMetricSelectionLabel(openMetricSelectionLabel === label ? null : label)}
-                                        className="text-[9px] font-black text-slate-400 hover:text-blue-600"
-                                      >
-                                        {count}个家金选择
-                                      </button>
-                                      {openMetricSelectionLabel === label && (
-                                        <div className="absolute right-0 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-2 shadow-lg text-[10px] font-bold text-slate-600">
-                                          {count === 0 ? (
-                                            <div className="text-slate-400">暂无选择</div>
-                                          ) : (
-                                            getMetricSelectionManagers(label).map((manager) => (
-                                              <div key={`${manager.name}-${manager.region}`} className="flex items-center justify-between">
-                                                <span>{manager.name}</span>
-                                                <span className="text-slate-400">{manager.region}</span>
-                                              </div>
-                                            ))
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            <div className="mt-3 flex items-center justify-between">
-                              <span className="text-[10px] text-slate-400 font-bold">
-                                已选 {otherMetricDraft.length} 项
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowOtherMetricPool(false)}
-                                  className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200 text-slate-500 hover:bg-slate-50"
-                                >
-                                  取消
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={otherMetricDraft.length === 0}
-                                  onClick={() => {
-                                    if (otherMetricDraft.length === 0) return;
-                                    setOtherMetricSelection(otherMetricDraft);
-                                    localStorage.setItem(branchMetricStorageKey, JSON.stringify({ base: baseMetricSelection, other: otherMetricDraft }));
-                                    if (!otherMetricDraft.includes(selectedOtherMetricKey)) {
-                                      setSelectedOtherMetricKey(otherMetricDraft[0]);
-                                    }
-                                    setShowOtherMetricPool(false);
-                                  }}
-                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                                    otherMetricDraft.length === 0
-                                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                                  }`}
-                                >
-                                  一键保存
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1074,17 +979,15 @@ const App: React.FC = () => {
 
                 {/* 指标卡片 (收缩在左上角) */}
                 <div className="p-4 bg-white">
-                  <div className={`grid gap-3 ${metricTab === 'other' ? 'grid-cols-3' : 'grid-cols-2 lg:grid-cols-3'}`}>
+                  <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
                     {currentMetrics.map((item) => (
                       <button
                         key={item.label}
                         onClick={() => {
                           if (metricTab === 'core') {
                             setSelectedCoreMetricKey(item.label);
-                          } else if (metricTab === 'base') {
-                            setSelectedBaseMetricKey(item.label);
                           } else {
-                            setSelectedOtherMetricKey(item.label);
+                            setSelectedBaseMetricKey(item.label);
                           }
                         }}
                         className={`text-left p-3 rounded-xl border transition-colors bg-white/80 hover:shadow-md flex flex-col gap-2 ${selectedMetricKey === item.label ? 'ring-2 ring-blue-300' : ''}`}
@@ -1178,7 +1081,7 @@ const App: React.FC = () => {
               <div className="mb-3">
                 <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center">
                   <span className="w-1.5 h-2.5 bg-blue-600 rounded-full mr-2"></span>
-                  {metricTab === 'core' ? '核心指标趋势' : metricTab === 'base' ? '基础指标趋势' : '其他指标趋势'}
+                  {metricTab === 'core' ? '核心指标趋势' : '基础指标趋势'}
                   <span className="ml-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
                     {reportPeriodLabel}
                   </span>
@@ -1186,7 +1089,7 @@ const App: React.FC = () => {
               </div>
               <div className="h-[220px] min-h-[260px] w-full bg-slate-50 rounded-lg p-3 border border-slate-100 flex-1">
                 <ResponsiveContainer width="100%" height="100%" minHeight={260} minWidth={0}>
-                  <LineChart data={metricTab === 'core' ? coreTrendData : metricTab === 'base' ? baseTrendData : otherTrendData}>
+                  <LineChart data={metricTab === 'core' ? coreTrendData : baseTrendData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                     <XAxis 
                       dataKey="day" 
